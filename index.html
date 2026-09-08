@@ -32,9 +32,32 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .profilebar{display:grid;grid-template-columns:minmax(170px,1fr) auto auto auto;gap:8px;align-items:end}.profile-actions{display:flex;gap:8px}
 @media(max-width:760px){.grid4{grid-template-columns:1fr 1fr}.header{flex-direction:column}.right{text-align:left}.account-grid{grid-template-columns:1fr 1fr}.kpi{min-height:92px}.profilebar{grid-template-columns:1fr 1fr}.profilebar .profile-select{grid-column:1/-1}.profile-actions{grid-column:1/-1}.profile-actions button{flex:1}}
+
+/* Fundo interativo de feriados */
+#holidayBg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .6s ease;background:
+  radial-gradient(circle at calc(20% + var(--hx,0px)) calc(18% + var(--hy,0px)),var(--holiday-a,#16a34a33),transparent 34%),
+  radial-gradient(circle at calc(80% - var(--hx,0px)) calc(72% - var(--hy,0px)),var(--holiday-b,#facc1533),transparent 36%),
+  linear-gradient(135deg,var(--holiday-c,#ffffff22),transparent 55%)}
+#holidayBg.active{opacity:1}
+#holidayBg .holiday-orb{position:absolute;border-radius:50%;filter:blur(2px);opacity:.2;animation:holidayPulse 7s ease-in-out infinite alternate}
+#holidayBg .holiday-item{position:absolute;top:110%;left:var(--x);font-size:var(--size);opacity:var(--opacity);animation:holidayFloat var(--dur) linear infinite;animation-delay:var(--delay);filter:drop-shadow(0 4px 8px #0002);will-change:transform,top}
+#holidayBg .holiday-item:nth-child(3n){animation-name:holidayFloatSwing}
+#holidayBg .holiday-item:nth-child(4n){animation-direction:reverse}
+#holidayBg .holiday-title{position:absolute;right:18px;bottom:16px;max-width:min(82vw,430px);padding:10px 14px;border:1px solid #ffffff55;border-radius:999px;background:#ffffffc7;backdrop-filter:blur(9px);color:#0f172a;font-size:13px;font-weight:800;box-shadow:0 8px 30px #0001}
+#loginView,#appView{position:relative;z-index:1}
+.holiday-spark{position:fixed;z-index:9;left:var(--sx);top:var(--sy);font-size:24px;pointer-events:none;animation:holidaySpark .9s ease-out forwards;transform:translate(-50%,-50%)}
+@keyframes holidayFloat{0%{transform:translate3d(0,0,0) rotate(0deg)}100%{transform:translate3d(var(--drift),-130vh,0) rotate(360deg)}}
+@keyframes holidayFloatSwing{0%{transform:translate3d(0,0,0) rotate(-12deg)}50%{transform:translate3d(var(--drift),-65vh,0) rotate(15deg)}100%{transform:translate3d(calc(var(--drift) * -.35),-130vh,0) rotate(-10deg)}}
+@keyframes holidayPulse{from{transform:scale(.8);opacity:.10}to{transform:scale(1.18);opacity:.28}}
+@keyframes holidaySpark{0%{transform:translate(-50%,-50%) scale(.6);opacity:1}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.7);opacity:0}}
+@media (prefers-reduced-motion:reduce){#holidayBg .holiday-item,#holidayBg .holiday-orb{animation:none!important}.holiday-spark{display:none!important}}
+
 </style>
 </head>
 <body>
+
+<div id="holidayBg" aria-hidden="true"></div>
+
 
 <div id="loginView" class="login-wrap">
   <div class="card login-card">
@@ -433,6 +456,120 @@ setInterval(()=>{if(session&&perfilAtual&&!document.hidden)loadCloud().catch(()=
     }
   }
 })();
+
+
+/* ===== Feriados: fundo interativo automático ===== */
+(function initHolidayBackground(){
+  const bg=document.getElementById('holidayBg');
+  if(!bg)return;
+
+  const pad=n=>String(n).padStart(2,'0');
+  const key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  const addDays=(d,n)=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x};
+
+  // Algoritmo de Meeus/Jones/Butcher para a Páscoa no calendário gregoriano.
+  function easterDate(year){
+    const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,
+      f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
+      i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+      month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+    return new Date(year,month-1,day);
+  }
+
+  function holidayFor(date){
+    const fixed={
+      '01-01':{name:'Ano Novo',icon:'🎆',items:['✨','🎇','🎆','🥂'],theme:['#2563eb35','#f59e0b3d','#ffffff36']},
+      '04-21':{name:'Tiradentes',icon:'🇧🇷',items:['🇧🇷','⭐','✨','💚','💛'],theme:['#16a34a32','#facc1535','#0ea5e92b']},
+      '05-01':{name:'Dia do Trabalho',icon:'⚙️',items:['⚙️','🛠️','✨','🔧'],theme:['#64748b32','#f59e0b31','#ffffff25']},
+      '09-07':{name:'Independência do Brasil',icon:'🇧🇷',items:['🇧🇷','⭐','💚','💛','✨'],theme:['#16a34a40','#facc1545','#2563eb2b']},
+      '10-12':{name:'Nossa Senhora Aparecida',icon:'💙',items:['💙','⭐','✨','🙏'],theme:['#2563eb38','#60a5fa35','#ffffff2f']},
+      '11-02':{name:'Finados',icon:'🕯️',items:['🕯️','✨','🤍'],theme:['#64748b2f','#cbd5e135','#ffffff30']},
+      '11-15':{name:'Proclamação da República',icon:'🇧🇷',items:['🇧🇷','⭐','✨','💚','💛'],theme:['#16a34a32','#facc1535','#2563eb25']},
+      '11-20':{name:'Dia da Consciência Negra',icon:'✊🏿',items:['✊🏿','✨','⭐','🤎'],theme:['#92400e33','#f59e0b2d','#11182725']},
+      '12-25':{name:'Natal',icon:'🎄',items:['🎄','⭐','🎁','✨','❄️'],theme:['#16a34a35','#dc262635','#facc1530']}
+    };
+    const md=`${pad(date.getMonth()+1)}-${pad(date.getDate())}`;
+    if(fixed[md])return fixed[md];
+
+    const easter=easterDate(date.getFullYear());
+    const movable=[
+      {d:addDays(easter,-48),h:{name:'Carnaval',icon:'🎭',items:['🎭','🎉','🎊','✨'],theme:['#a855f73a','#ec489938','#f59e0b35']}},
+      {d:addDays(easter,-47),h:{name:'Carnaval',icon:'🎭',items:['🎭','🎉','🎊','✨'],theme:['#a855f73a','#ec489938','#f59e0b35']}},
+      {d:addDays(easter,-2),h:{name:'Sexta-feira Santa',icon:'🕊️',items:['🕊️','✨','🤍'],theme:['#94a3b832','#e2e8f037','#ffffff36']}},
+      {d:easter,h:{name:'Páscoa',icon:'🐰',items:['🐰','🥚','🌸','✨'],theme:['#ec489933','#a78bfa30','#facc1530']}},
+      {d:addDays(easter,60),h:{name:'Corpus Christi',icon:'✨',items:['✨','🤍','⭐'],theme:['#60a5fa2f','#e2e8f03d','#ffffff36']}}
+    ];
+    const todayKey=key(date);
+    const found=movable.find(x=>key(x.d)===todayKey);
+    return found?found.h:null;
+  }
+
+  const holiday=holidayFor(new Date());
+  if(!holiday)return;
+
+  bg.style.setProperty('--holiday-a',holiday.theme[0]);
+  bg.style.setProperty('--holiday-b',holiday.theme[1]);
+  bg.style.setProperty('--holiday-c',holiday.theme[2]);
+
+  // Formas luminosas de fundo.
+  for(let i=0;i<5;i++){
+    const orb=document.createElement('span');
+    orb.className='holiday-orb';
+    const size=120+Math.random()*260;
+    orb.style.width=orb.style.height=size+'px';
+    orb.style.left=(Math.random()*90-5)+'%';
+    orb.style.top=(Math.random()*90-5)+'%';
+    orb.style.background=i%2?holiday.theme[0]:holiday.theme[1];
+    orb.style.animationDelay=(-Math.random()*6)+'s';
+    bg.appendChild(orb);
+  }
+
+  // Ícones flutuantes do feriado.
+  const count=window.innerWidth<600?16:26;
+  for(let i=0;i<count;i++){
+    const el=document.createElement('span');
+    el.className='holiday-item';
+    el.textContent=holiday.items[i%holiday.items.length];
+    el.style.setProperty('--x',(Math.random()*100)+'%');
+    el.style.setProperty('--size',(18+Math.random()*28)+'px');
+    el.style.setProperty('--opacity',(0.16+Math.random()*0.30).toFixed(2));
+    el.style.setProperty('--dur',(11+Math.random()*14)+'s');
+    el.style.setProperty('--delay',(-Math.random()*18)+'s');
+    el.style.setProperty('--drift',(-90+Math.random()*180)+'px');
+    bg.appendChild(el);
+  }
+
+  const title=document.createElement('div');
+  title.className='holiday-title';
+  title.textContent=`${holiday.icon} Hoje: ${holiday.name}`;
+  bg.appendChild(title);
+  bg.classList.add('active');
+
+  // Parallax leve conforme o mouse/caneta se move.
+  document.addEventListener('pointermove',e=>{
+    const nx=(e.clientX/window.innerWidth-.5)*12;
+    const ny=(e.clientY/window.innerHeight-.5)*12;
+    bg.style.setProperty('--hx',nx+'px');
+    bg.style.setProperty('--hy',ny+'px');
+  },{passive:true});
+
+  // Ao tocar/clicar em uma área livre, solta pequenas partículas temáticas.
+  document.addEventListener('pointerdown',e=>{
+    if(e.target.closest('button,input,select,option'))return;
+    for(let i=0;i<5;i++){
+      const s=document.createElement('span');
+      s.className='holiday-spark';
+      s.textContent=holiday.items[(i+Math.floor(Math.random()*holiday.items.length))%holiday.items.length];
+      s.style.setProperty('--sx',e.clientX+'px');
+      s.style.setProperty('--sy',e.clientY+'px');
+      s.style.setProperty('--dx',(-55+Math.random()*110)+'px');
+      s.style.setProperty('--dy',(-30-Math.random()*90)+'px');
+      document.body.appendChild(s);
+      setTimeout(()=>s.remove(),1000);
+    }
+  });
+})();
+
 </script>
 </body>
 </html>
