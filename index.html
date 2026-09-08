@@ -23,7 +23,8 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 .header .muted{color:#cbd5e1}.right{text-align:right}.status{display:inline-block;background:#ffffff16;padding:6px 9px;border-radius:999px;font-size:12px}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.kpi{min-height:100px}.kpi b{font-size:20px;display:block;margin-top:6px}
 .row{display:flex;gap:10px;align-items:center}.between{justify-content:space-between}.grow{flex:1}.mb{margin-bottom:14px}.mt{margin-top:12px}
-.account{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:10px}
+.account{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:10px}.account.editable{cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}.account.editable:hover{transform:translateY(-1px);border-color:#bfdbfe;box-shadow:0 6px 18px #0f172a0d}.account.editable:focus-visible{outline:3px solid #2563eb28;border-color:#2563eb}
+.income-card{cursor:pointer;transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease}.income-card:hover{transform:translateY(-1px);border-color:#bfdbfe;box-shadow:0 6px 18px #0f172a0d}.income-card:focus-visible{outline:3px solid #2563eb28;border-color:#2563eb}.income-value{font-size:24px;font-weight:900;margin-top:5px;color:#059669}.income-card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}.income-edit-hint{white-space:nowrap}
 .account-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px;font-size:14px}.label{font-size:11px;color:var(--muted)}
 .progress{height:7px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin-top:13px}.progress>div{height:100%;background:#10b981}
 .pay{width:100%;margin-top:12px;border:1px solid #a7f3d0;background:#fff;color:#047857}.linkbtn{background:none;color:#2563eb;padding:5px}
@@ -31,6 +32,7 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 .modal-bg{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modal{width:min(100%,440px);background:#fff;border-radius:20px;padding:18px}
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .profile-switch-card{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.profile-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .current-profile{display:flex;align-items:center;gap:12px;min-width:0}
 .mini-avatar{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-size:25px;flex:0 0 auto;box-shadow:inset 0 0 0 2px #ffffff3b}
 .profile-name-now{font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -47,8 +49,10 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 .profile-tile:hover .profile-avatar,.profile-tile:focus-visible .profile-avatar{transform:scale(1.055);box-shadow:inset 0 0 0 3px #fff;filter:brightness(1.05)}
 .profile-tile:hover,.profile-tile:focus-visible{color:#fff;outline:none}
 .add-avatar{background:#2b2b2b;color:#cfcfcf;font-size:74px;font-weight:200}
-.profile-manage-overlay{position:absolute;inset:0;border-radius:8px;background:#0009;display:flex;align-items:center;justify-content:center;gap:10px}
-.profile-manage-overlay button{width:46px;height:46px;border-radius:50%;padding:0;font-size:20px;background:#ffffffea;color:#111}
+.profile-manage-overlay{position:absolute;inset:0;border-radius:8px;background:#000a;display:flex;align-items:center;justify-content:center;gap:9px;padding:10px}
+.profile-manage-overlay button{width:44px;height:44px;border-radius:50%;padding:0;font-size:19px;background:#ffffffea;color:#111;display:grid;place-items:center;border:2px solid transparent}
+.profile-manage-overlay button:hover,.profile-manage-overlay button:focus-visible{transform:scale(1.06);border-color:#fff;outline:none}
+.profile-manage-overlay button.photo{background:#dbeafe;color:#1d4ed8}
 .profile-manage-overlay button.danger{background:#ef4444;color:#fff}
 .chooser-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 .chooser-btn{background:transparent;border:1px solid #808080;color:#b3b3b3;border-radius:2px;padding:10px 18px;letter-spacing:1.5px;text-transform:uppercase;font-size:13px}
@@ -56,13 +60,11 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 .chooser-btn.done{background:#fff;color:#111;border-color:#fff}
 .chooser-top{position:absolute;top:16px;right:16px;display:flex;gap:8px}
 .chooser-top button{background:#ffffff12;color:#eee;padding:8px 10px}
-@media(max-width:760px){.grid4{grid-template-columns:1fr 1fr}.header{flex-direction:column}.right{text-align:left}.account-grid{grid-template-columns:1fr 1fr}.kpi{min-height:92px}.profile-switch-card{align-items:stretch;flex-direction:column}.profile-avatar{width:120px;height:120px;font-size:58px}.profile-tile{width:120px}.profile-grid{gap:22px 16px}.profile-tile .profile-label{font-size:15px}}
+@media(max-width:760px){.grid4{grid-template-columns:1fr 1fr}.header{flex-direction:column}.right{text-align:left}.account-grid{grid-template-columns:1fr 1fr}.kpi{min-height:92px}.profile-switch-card{align-items:stretch;flex-direction:column}.profile-actions{justify-content:stretch}.profile-actions button{flex:1}.profile-avatar{width:120px;height:120px;font-size:58px}.profile-tile{width:120px}.profile-grid{gap:22px 16px}.profile-tile .profile-label{font-size:15px}}
 @media(max-width:420px){.profile-avatar{width:105px;height:105px;font-size:50px}.profile-tile{width:105px}.profile-grid{gap:20px 14px}.profile-chooser-shell h1{font-size:28px}.chooser-actions{gap:8px}.chooser-btn{font-size:12px;padding:10px 12px}}
 
 .profile-avatar img,.mini-avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .mini-avatar{overflow:hidden}
-.profile-photo-btn{position:absolute;right:7px;bottom:7px;width:38px;height:38px;border-radius:50%;padding:0;display:grid;place-items:center;background:#fff;color:#111;font-size:18px;border:2px solid #111;box-shadow:0 2px 8px #0005}
-.profile-photo-btn:hover{transform:scale(1.06)}
 #avatarInput{display:none}
 #savingMessage{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;background:#111;color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;box-shadow:0 8px 28px #0005}
 .saving-dialog{position:fixed;inset:0;background:#0008;z-index:35;display:flex;align-items:center;justify-content:center;padding:18px}
@@ -71,6 +73,14 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 .saving-card h2{margin-bottom:8px}
 .saving-quote{font-size:18px;line-height:1.5;color:#334155;margin:12px 0 18px}
 .saving-tip{font-size:13px;color:#64748b;margin-bottom:18px}
+.economy-card{position:relative;overflow:hidden;background:linear-gradient(135deg,#eff6ff,#ffffff 52%,#ecfdf5);border-color:#bfdbfe}
+.economy-card:before{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-75px;top:-90px;background:#10b98114;pointer-events:none}
+.economy-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.economy-card-title{font-weight:800;font-size:16px}.economy-quote{font-size:17px;line-height:1.5;font-weight:700;color:#0f172a;margin:0 0 8px}
+.economy-tip{font-size:13px;line-height:1.45;color:#475569;margin:0}.economy-refresh{white-space:nowrap;background:#fff;border:1px solid #bfdbfe;color:#1d4ed8;padding:9px 11px}
+.health-card{display:flex;align-items:center;justify-content:space-between;gap:14px}.health-main{min-width:0}.health-value{font-weight:900;font-size:22px;margin-top:3px}.health-note{font-size:13px;color:#64748b;margin-top:4px}
+.health-badge{flex:0 0 auto;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}.health-good{background:#ecfdf5;color:#047857}.health-mid{background:#fffbeb;color:#92400e}.health-high{background:#fef2f2;color:#b91c1c}.health-neutral{background:#f1f5f9;color:#475569}
+@media(max-width:520px){.economy-card-head,.health-card{align-items:stretch;flex-direction:column}.economy-refresh{width:100%}}
 
 /* Fundo interativo de feriados */
 #holidayBg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .6s ease;background:
@@ -151,7 +161,6 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
         <div id="dataHoje" class="muted small"></div>
       </div>
       <div class="right">
-        <div id="sync" class="status">☁️ Conectado</div><br>
         <button id="copiarLink" style="margin-top:8px;background:#ffffff12;color:white;padding:7px 9px">Copiar link</button>
         <button id="atualizar" style="margin-top:8px;background:#ffffff12;color:white;padding:7px 9px">Atualizar</button>
         <button id="sair" style="margin-top:8px;background:#ffffff12;color:white;padding:7px 9px">Sair</button>
@@ -167,7 +176,21 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
           <div class="muted small">Este painel mostra somente os dados deste perfil.</div>
         </div>
       </div>
-      <button id="trocarPerfil" class="btn-soft" type="button">Trocar perfil</button>
+      <div class="profile-actions">
+        <button id="trocarPerfil" class="btn-soft" type="button">Trocar perfil</button>
+      </div>
+    </section>
+
+    <section class="card mb economy-card" aria-labelledby="economyTitle">
+      <div class="economy-card-head">
+        <div>
+          <div class="label">ECONOMIA DO PERFIL</div>
+          <div id="economyTitle" class="economy-card-title">💡 Frase de economia</div>
+        </div>
+        <button id="novaFrase" class="economy-refresh" type="button">↻ Nova frase</button>
+      </div>
+      <p id="profileSavingQuote" class="economy-quote">Organize hoje para ter mais liberdade amanhã.</p>
+      <p id="profileSavingTip" class="economy-tip">Dica: acompanhe suas parcelas antes de assumir uma nova.</p>
     </section>
 
     <div id="importBox" class="notice warn mb hidden">
@@ -179,19 +202,30 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
       </div>
     </div>
 
-    <section class="card mb">
-      <div class="label">RENDA MENSAL DESTE PERFIL</div>
-      <div class="row mt">
-        <input id="renda" type="number" min="0" step="0.01" placeholder="Ex.: 1800">
-        <button id="salvarRenda" class="btn-blue">Salvar</button>
+    <section id="rendaCard" class="card mb income-card" role="button" tabindex="0" aria-label="Editar renda mensal deste perfil">
+      <div class="income-card-head">
+        <div>
+          <div class="label">RENDA MENSAL DESTE PERFIL</div>
+          <div id="rendaDisplay" class="income-value">Não informada</div>
+        </div>
+        <span class="muted tiny income-edit-hint">Toque para editar</span>
       </div>
     </section>
 
     <section class="grid4">
-      <div class="card kpi"><div class="label">A PAGAR NO MÊS</div><b id="mensal">R$ 0,00</b></div>
+      <div class="card kpi"><div class="label">A PAGAR NO MÊS</div><b id="mensal" style="color:#d97706">R$ 0,00</b></div>
       <div class="card kpi"><div class="label">SALDO DEVEDOR</div><b id="devedor" style="color:#dc2626">R$ 0,00</b></div>
       <div class="card kpi"><div class="label">CONTAS ATIVAS</div><b id="ativas">0</b></div>
-      <div class="card kpi"><div class="label">SOBRA APÓS PARCELAS</div><b id="sobra">—</b></div>
+      <div class="card kpi"><div class="label">SALDO LIVRE DO MÊS</div><b id="sobra" style="color:#2563eb">—</b></div>
+    </section>
+
+    <section class="card mb health-card" aria-live="polite">
+      <div class="health-main">
+        <div class="label">COMPROMETIMENTO DA RENDA COM PARCELAS</div>
+        <div id="healthValue" class="health-value">—</div>
+        <div id="healthNote" class="health-note">Informe sua renda mensal para acompanhar este indicador.</div>
+      </div>
+      <div id="healthBadge" class="health-badge health-neutral">Sem renda cadastrada</div>
     </section>
 
     <div class="row between mb">
@@ -202,6 +236,19 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 
     <h2 style="margin-top:22px;margin-bottom:10px">✅ Quitadas</h2>
     <div id="listaQuitadas"></div>
+  </div>
+</div>
+
+<div id="rendaModalBg" class="modal-bg hidden">
+  <div class="modal">
+    <div class="row between mb"><h3 style="margin:0">Editar renda mensal</h3><button id="fecharRenda" class="btn-soft" type="button">✕</button></div>
+    <div class="gap12">
+      <div>
+        <div class="label" style="margin-bottom:6px">RENDA MENSAL — <span id="rendaPerfilNome">PERFIL</span></div>
+        <input id="rendaEdit" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 1800">
+      </div>
+      <button id="salvarRenda" class="btn-blue full" type="button">Salvar renda</button>
+    </div>
   </div>
 </div>
 
@@ -235,7 +282,7 @@ const safe=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;
 const profileStorageKey=()=>`finance_profile_${user?.id||"anon"}`;
 
 function setMsg(text,type="info"){const el=$("msg");el.textContent=text;el.className="notice "+type}
-function setSync(text){$("sync").textContent=text}
+function setSync(text){const el=$("sync");if(el)el.textContent=text}
 async function fetchTimeout(url,opts={},ms=20000){
   const c=new AbortController(),t=setTimeout(()=>c.abort(),ms);
   try{return await fetch(url,{...opts,signal:c.signal})}finally{clearTimeout(t)}
@@ -356,7 +403,7 @@ function renderProfiles(){
     const av=avatarFor(perfilAtual);
     $("perfilHeader").textContent="Perfil: "+perfilAtual.nome;
     $("perfilNomeDashboard").textContent=perfilAtual.nome;
-    $("miniAvatar").innerHTML=av.photo?`<img src="${av.photo}" alt="">`:av.emoji;
+    $("miniAvatar").innerHTML=av.photo?`<img src="${av.photo}" alt="Foto do perfil ${safe(perfilAtual.nome)}">`:av.emoji;
     $("miniAvatar").style.background=av.bg;
   }
   const grid=$("profileGrid");
@@ -365,12 +412,12 @@ function renderProfiles(){
     const av=avatarFor(p);
     const manage=manageProfiles?`
       <div class="profile-manage-overlay">
-        <button type="button" data-action="rename" data-id="${p.id}" aria-label="Renomear ${safe(p.nome)}">✎</button>
-        <button type="button" class="danger" data-action="delete" data-id="${p.id}" aria-label="Excluir ${safe(p.nome)}"${perfis.length<=1?" disabled":""}>🗑</button>
+        <button type="button" class="photo" data-action="photo" data-id="${p.id}" aria-label="${av.photo?"Trocar":"Adicionar"} foto de ${safe(p.nome)}" title="${av.photo?"Trocar":"Adicionar"} foto">📷</button>
+        <button type="button" data-action="rename" data-id="${p.id}" aria-label="Renomear ${safe(p.nome)}" title="Renomear perfil">✎</button>
+        <button type="button" class="danger" data-action="delete" data-id="${p.id}" aria-label="Excluir ${safe(p.nome)}" title="Excluir perfil"${perfis.length<=1?" disabled":""}>🗑</button>
       </div>`:"";
-    const photoButton=manage?`<button type="button" class="profile-photo-btn" data-action="photo" data-id="${p.id}" aria-label="Mudar foto de ${safe(p.nome)}">📷</button>`:"";
     return `<button type="button" class="profile-tile" data-action="select" data-id="${p.id}" aria-label="Abrir perfil ${safe(p.nome)}">
-      <span class="profile-avatar" style="background:${av.bg}">${av.photo?`<img src="${av.photo}" alt="">`:av.emoji}${manage}${photoButton}</span>
+      <span class="profile-avatar" style="background:${av.bg}">${av.photo?`<img src="${av.photo}" alt="">`:av.emoji}${manage}</span>
       <span class="profile-label">${safe(p.nome)}</span>
     </button>`;
   }).join("");
@@ -408,12 +455,49 @@ const SAVING_TIPS=[
   "Dica: tente manter uma parte da renda livre para imprevistos.",
   "Dica: revise suas contas recorrentes e elimine o que você quase não usa."
 ];
+function randomSavingContent(){
+  return {
+    quote:SAVING_QUOTES[Math.floor(Math.random()*SAVING_QUOTES.length)],
+    tip:SAVING_TIPS[Math.floor(Math.random()*SAVING_TIPS.length)]
+  };
+}
+function updateEconomyCard(){
+  const c=randomSavingContent();
+  if($("profileSavingQuote"))$("profileSavingQuote").textContent=c.quote;
+  if($("profileSavingTip"))$("profileSavingTip").textContent=c.tip;
+}
 function showSavingMessage(){
-  const quote=SAVING_QUOTES[Math.floor(Math.random()*SAVING_QUOTES.length)];
-  const tip=SAVING_TIPS[Math.floor(Math.random()*SAVING_TIPS.length)];
-  $("savingQuote").textContent=quote;
-  $("savingTip").textContent=tip;
+  const c=randomSavingContent();
+  $("savingQuote").textContent=c.quote;
+  $("savingTip").textContent=c.tip;
   $("savingDialog").classList.remove("hidden");
+}
+function updateFinancialHealth(monthly){
+  const value=$("healthValue"),note=$("healthNote"),badge=$("healthBadge");
+  if(!value||!note||!badge)return;
+  badge.className="health-badge";
+  if(!(renda>0)){
+    value.textContent="—";
+    note.textContent="Informe sua renda mensal para acompanhar este indicador.";
+    badge.textContent="Sem renda cadastrada";
+    badge.classList.add("health-neutral");
+    return;
+  }
+  const pct=(monthly/renda)*100;
+  value.textContent=pct.toLocaleString("pt-BR",{maximumFractionDigits:1})+"%";
+  if(pct<=30){
+    note.textContent="Suas parcelas ocupam uma parte controlada da renda. Ainda assim, avalie novas compras com cuidado.";
+    badge.textContent="Faixa confortável";
+    badge.classList.add("health-good");
+  }else if(pct<=50){
+    note.textContent="Uma parte importante da renda já está comprometida. Evite novas parcelas sem revisar o orçamento.";
+    badge.textContent="Atenção";
+    badge.classList.add("health-mid");
+  }else{
+    note.textContent="Mais da metade da renda está comprometida com parcelas. Priorize reduzir dívidas antes de assumir novas.";
+    badge.textContent="Comprometimento alto";
+    badge.classList.add("health-high");
+  }
 }
 async function selectProfile(id){
   const found=perfis.find(p=>p.id===Number(id));
@@ -424,7 +508,7 @@ async function selectProfile(id){
   $("profileChooserView").classList.add("hidden");
   $("appView").classList.remove("hidden");
   await loadCloud();
-  showSavingMessage();
+  updateEconomyCard();
 }
 async function loadCloud(){
   if(!session||!perfilAtual||carregando)return;
@@ -436,7 +520,7 @@ async function loadCloud(){
     ]);
     contas=(a||[]).map(x=>({...x,valor:Number(x.valor),parcelas:Number(x.parcelas),paga:Number(x.paga)}));
     renda=Number(s?.[0]?.renda_mensal||0);
-    $("renda").value=renda||"";
+    updateIncomeDisplay();
     render();
     const local=localData();
     if(contas.length===0&&local?.length){
@@ -468,21 +552,28 @@ async function importarLocal(){
   await loadCloud();
 }
 
+function updateIncomeDisplay(){
+  const el=$("rendaDisplay");
+  if(!el)return;
+  el.textContent=renda>0?moeda(renda):"Não informada";
+}
+
 function render(){
   const at=contas.filter(x=>x.paga<x.parcelas),q=contas.filter(x=>x.paga>=x.parcelas);
   const mensal=at.reduce((s,x)=>s+parcela(x),0),dev=at.reduce((s,x)=>s+restante(x),0);
   $("mensal").textContent=moeda(mensal);$("devedor").textContent=moeda(dev);$("ativas").textContent=at.length;
   $("sobra").textContent=renda>0?moeda(renda-mensal):"—";
+  updateFinancialHealth(mensal);
   $("listaAtivas").innerHTML=at.length?at.map(x=>{
     const pct=Math.min(100,(x.paga/x.parcelas)*100);
-    return `<div class="account">
-      <div class="row between"><div><b>${safe(x.produto)}</b><div class="muted small">${x.paga}/${x.parcelas} pagas · faltam ${x.parcelas-x.paga}</div></div><button class="linkbtn" onclick="editar(${x.id})">Editar</button></div>
+    return `<div class="account editable" role="button" tabindex="0" aria-label="Editar conta ${safe(x.produto)}" onclick="editar(${x.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();editar(${x.id})}">
+      <div class="row between"><div><b>${safe(x.produto)}</b><div class="muted small">${x.paga}/${x.parcelas} pagas · faltam ${x.parcelas-x.paga}</div></div><span class="muted tiny">Toque para editar</span></div>
       <div class="account-grid"><div><span class="label">PARCELA</span><br><b>${moeda(parcela(x))}</b></div><div><span class="label">RESTANTE</span><br><b style="color:#dc2626">${moeda(restante(x))}</b></div><div><span class="label">TOTAL</span><br><b>${moeda(x.valor)}</b></div></div>
       <div class="progress"><div style="width:${pct}%"></div></div>
-      <button class="pay" onclick="pagar(${x.id})">✓ Marcar 1 parcela como paga</button>
+      <button class="pay" onclick="event.stopPropagation();pagar(${x.id})">✓ Marcar 1 parcela como paga</button>
     </div>`;
   }).join(""):'<div class="card muted">Nenhuma conta ativa neste perfil.</div>';
-  $("listaQuitadas").innerHTML=q.length?q.map(x=>`<div class="account row between"><div><b>${safe(x.produto)}</b><div class="muted small">${moeda(x.valor)} · quitada</div></div><button class="linkbtn" onclick="editar(${x.id})">Editar</button></div>`).join(""):'<div class="card muted">Nenhuma conta quitada neste perfil.</div>';
+  $("listaQuitadas").innerHTML=q.length?q.map(x=>`<div class="account editable row between" role="button" tabindex="0" aria-label="Editar conta ${safe(x.produto)}" onclick="editar(${x.id})" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();editar(${x.id})}"><div><b>${safe(x.produto)}</b><div class="muted small">${moeda(x.valor)} · quitada</div></div><span class="muted tiny">Toque para editar</span></div>`).join(""):'<div class="card muted">Nenhuma conta quitada neste perfil.</div>';
 }
 async function pagar(id){
   const x=contas.find(c=>c.id===id);if(!x)return;
@@ -508,6 +599,11 @@ window.editar=id=>{
 };
 $("fechar").onclick=fecharModal;
 $("modalBg").onclick=e=>{if(e.target===$("modalBg"))fecharModal()};
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+  if(!$("modalBg").classList.contains("hidden"))fecharModal();
+  if(!$("rendaModalBg").classList.contains("hidden"))fecharRendaModal();
+});
 $("salvar").onclick=async()=>{
   const produto=$("nome").value.trim(),valor=Number($("valor").value),parcelas=Math.max(1,Number($("parcelas").value)||1),paga=Math.max(0,Math.min(parcelas,Number($("pagas").value)||0));
   if(!produto||valor<=0)return alert("Preencha nome e valor corretamente.");
@@ -532,6 +628,7 @@ $("excluir").onclick=async()=>{
 };
 
 $("savingContinue").onclick=()=>$("savingDialog").classList.add("hidden");
+$("novaFrase").onclick=updateEconomyCard;
 
 let avatarProfileTarget=null;
 function fileToDataURL(file){
@@ -648,9 +745,28 @@ $("gerenciarPerfis").onclick=()=>{
 };
 $("trocarPerfil").onclick=()=>showProfileChooser();
 
+function abrirRendaModal(){
+  $("rendaEdit").value=renda>0?renda:"";
+  $("rendaPerfilNome").textContent=perfilAtual?.nome||"Perfil";
+  $("rendaModalBg").classList.remove("hidden");
+  setTimeout(()=>$("rendaEdit").focus(),0);
+}
+function fecharRendaModal(){$("rendaModalBg").classList.add("hidden")}
+$("rendaCard").onclick=abrirRendaModal;
+$("rendaCard").onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();abrirRendaModal()}};
+$("fecharRenda").onclick=fecharRendaModal;
+$("rendaModalBg").onclick=e=>{if(e.target===$("rendaModalBg"))fecharRendaModal()};
+$("rendaEdit").addEventListener("keydown",e=>{if(e.key==="Enter")$("salvarRenda").click()});
 $("salvarRenda").onclick=async()=>{
-  try{const v=Math.max(0,Number($("renda").value)||0);setSync("☁️ Salvando...");await saveIncomeValue(v);await loadCloud()}
-  catch(e){alert("Não consegui salvar a renda: "+e.message)}
+  try{
+    const v=Math.max(0,Number($("rendaEdit").value)||0);
+    setSync("☁️ Salvando...");
+    await saveIncomeValue(v);
+    renda=v;
+    updateIncomeDisplay();
+    fecharRendaModal();
+    await loadCloud();
+  }catch(e){alert("Não consegui salvar a renda: "+e.message)}
 };
 $("importar").onclick=()=>importarLocal().catch(e=>alert("Não consegui importar: "+e.message));
 $("naoImportar").onclick=()=>$("importBox").classList.add("hidden");
@@ -667,6 +783,7 @@ $("chooserCopyLink").onclick=async()=>{
 };
 $("entrar").onclick=()=>authAction("login");
 $("criar").onclick=()=>authAction("signup");
+$("senha").addEventListener("keydown",e=>{if(e.key==="Enter")authAction("login")});
 async function logoutApp(){
   try{if(session?.access_token)await fetchTimeout(BASE+"/auth/v1/logout",{method:"POST",headers:{apikey:APIKEY,Authorization:"Bearer "+session.access_token}},8000)}catch{}
   saveSession(null);user=null;contas=[];renda=0;perfis=[];perfilAtual=null;manageProfiles=false;
