@@ -2,198 +2,373 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
 <title>Contas de Matheus</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--text:#1e293b;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--green:#059669;--red:#dc2626;--dark:#0f172a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+.wrap{max-width:980px;margin:auto;padding:16px}.hidden{display:none!important}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 1px 2px #00000008}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+.login-card{width:min(100%,430px);padding:26px}.center{text-align:center}
+h1,h2,h3,p{margin-top:0}.muted{color:var(--muted)}.small{font-size:12px}.tiny{font-size:11px}
+input{width:100%;border:1px solid #cbd5e1;border-radius:12px;padding:13px;font-size:16px;background:#fff;color:#0f172a;outline:none}
+input:focus{border-color:#2563eb;box-shadow:0 0 0 3px #2563eb18}
+button{border:0;border-radius:12px;padding:12px 15px;font-weight:700;font-size:15px;cursor:pointer}
+button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#fff}.btn-outline{background:#fff;border:1px solid #bfdbfe;color:#1d4ed8}
+.btn-green{background:var(--green);color:#fff}.btn-red{background:#fff;color:var(--red)}.btn-soft{background:#f1f5f9;color:#334155}
+.full{width:100%}.gap8{display:grid;gap:8px}.gap12{display:grid;gap:12px}
+.header{background:var(--dark);color:#fff;border-radius:20px;padding:18px;margin-bottom:14px;display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.header .muted{color:#cbd5e1}.right{text-align:right}.status{display:inline-block;background:#ffffff16;padding:6px 9px;border-radius:999px;font-size:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}.kpi{min-height:100px}.kpi b{font-size:20px;display:block;margin-top:6px}
+.row{display:flex;gap:10px;align-items:center}.between{justify-content:space-between}.grow{flex:1}.mb{margin-bottom:14px}.mt{margin-top:12px}
+.account{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:10px}
+.account-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px;font-size:14px}.label{font-size:11px;color:var(--muted)}
+.progress{height:7px;border-radius:99px;background:#e2e8f0;overflow:hidden;margin-top:13px}.progress>div{height:100%;background:#10b981}
+.pay{width:100%;margin-top:12px;border:1px solid #a7f3d0;background:#fff;color:#047857}.linkbtn{background:none;color:#2563eb;padding:5px}
+.notice{padding:13px;border-radius:13px;font-size:14px}.ok{background:#ecfdf5;color:#047857}.err{background:#fef2f2;color:#b91c1c}.info{background:#eff6ff;color:#1d4ed8}.warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.modal-bg{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modal{width:min(100%,440px);background:#fff;border-radius:20px;padding:18px}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:700px){.grid4{grid-template-columns:1fr 1fr}.header{flex-direction:column}.right{text-align:left}.account-grid{grid-template-columns:1fr 1fr}.kpi{min-height:92px}}
+</style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
-<div id="login" class="min-h-screen flex items-center justify-center p-4">
-  <div class="w-full max-w-md bg-white p-6 rounded-3xl border shadow-sm">
-    <h1 class="text-2xl font-bold text-center">💰 Contas de Matheus</h1>
-    <p class="text-sm text-slate-500 text-center mt-2 mb-5">Entre para sincronizar celular e computador.</p>
-    <input id="email" type="email" placeholder="E-mail" class="w-full border rounded-xl p-3 mb-3">
-    <input id="senha" type="password" placeholder="Senha (mínimo 6 caracteres)" class="w-full border rounded-xl p-3 mb-3">
-    <button id="entrar" class="w-full bg-blue-600 text-white font-bold rounded-xl p-3 mb-2">Entrar</button>
-    <button id="criar" class="w-full border border-blue-200 text-blue-700 font-bold rounded-xl p-3">Criar conta</button>
-    <div id="msg" class="text-sm mt-3"></div>
+<body>
+
+<div id="loginView" class="login-wrap">
+  <div class="card login-card">
+    <div class="center">
+      <div style="font-size:38px">💰</div>
+      <h1>Contas de Matheus</h1>
+      <p class="muted">Entre para sincronizar celular e computador.</p>
+    </div>
+    <div class="gap12">
+      <input id="email" type="email" autocomplete="email" placeholder="E-mail">
+      <input id="senha" type="password" autocomplete="current-password" placeholder="Senha (mínimo 6 caracteres)">
+      <button id="entrar" class="btn-blue full">Entrar</button>
+      <button id="criar" class="btn-outline full">Criar conta</button>
+      <div id="msg" class="notice info">Sistema pronto. Preencha e-mail e senha.</div>
+    </div>
   </div>
 </div>
 
-<div id="app" class="hidden max-w-4xl mx-auto p-4">
-  <header class="bg-slate-900 text-white rounded-2xl p-5 mb-4">
-    <div class="flex justify-between gap-3">
+<div id="appView" class="hidden">
+  <div class="wrap">
+    <header class="header">
       <div>
-        <h1 class="text-2xl font-bold">💰 Contas de Matheus</h1>
-        <div id="dataHoje" class="text-sm text-slate-300 mt-1"></div>
+        <h1 style="margin-bottom:4px">💰 Contas de Matheus</h1>
+        <div id="dataHoje" class="muted small"></div>
       </div>
-      <div class="text-right">
-        <div id="sync" class="text-xs bg-white/10 rounded-full px-2 py-1">☁️ Sincronizando</div>
-        <button id="sair" class="text-xs mt-2 underline">Sair</button>
+      <div class="right">
+        <div id="sync" class="status">☁️ Conectado</div><br>
+        <button id="atualizar" style="margin-top:8px;background:#ffffff12;color:white;padding:7px 9px">Atualizar</button>
+        <button id="sair" style="margin-top:8px;background:#ffffff12;color:white;padding:7px 9px">Sair</button>
+      </div>
+    </header>
+
+    <div id="importBox" class="notice warn mb hidden">
+      <b>Encontramos contas salvas neste aparelho.</b>
+      <div id="importText" class="small" style="margin:5px 0 10px"></div>
+      <div class="row">
+        <button id="importar" class="btn-green">Importar para a nuvem</button>
+        <button id="naoImportar" class="btn-soft">Não agora</button>
       </div>
     </div>
-  </header>
 
-  <section class="bg-white border rounded-2xl p-4 mb-4">
-    <label class="text-xs uppercase font-bold text-slate-500">Renda mensal</label>
-    <div class="flex gap-2 mt-1">
-      <input id="renda" type="number" step="0.01" min="0" class="border rounded-xl p-3 flex-1" placeholder="Ex.: 1800">
-      <button id="salvarRenda" class="bg-blue-600 text-white font-bold rounded-xl px-4">Salvar</button>
+    <section class="card mb">
+      <div class="label">RENDA MENSAL</div>
+      <div class="row mt">
+        <input id="renda" type="number" min="0" step="0.01" placeholder="Ex.: 1800">
+        <button id="salvarRenda" class="btn-blue">Salvar</button>
+      </div>
+    </section>
+
+    <section class="grid4">
+      <div class="card kpi"><div class="label">A PAGAR NO MÊS</div><b id="mensal">R$ 0,00</b></div>
+      <div class="card kpi"><div class="label">SALDO DEVEDOR</div><b id="devedor" style="color:#dc2626">R$ 0,00</b></div>
+      <div class="card kpi"><div class="label">CONTAS ATIVAS</div><b id="ativas">0</b></div>
+      <div class="card kpi"><div class="label">SOBRA APÓS PARCELAS</div><b id="sobra">—</b></div>
+    </section>
+
+    <div class="row between mb">
+      <div><h2 style="margin-bottom:2px">Contas ativas</h2><div class="muted small">Os dados são salvos na nuvem.</div></div>
+      <button id="nova" class="btn-green">+ Nova conta</button>
     </div>
-  </section>
+    <div id="listaAtivas"></div>
 
-  <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-    <div class="bg-white border rounded-2xl p-4"><div class="text-xs text-slate-500">A PAGAR NO MÊS</div><b id="mensal" class="text-lg"></b></div>
-    <div class="bg-white border rounded-2xl p-4"><div class="text-xs text-slate-500">SALDO DEVEDOR</div><b id="devedor" class="text-lg text-red-600"></b></div>
-    <div class="bg-white border rounded-2xl p-4"><div class="text-xs text-slate-500">CONTAS ATIVAS</div><b id="ativas" class="text-lg"></b></div>
-    <div class="bg-white border rounded-2xl p-4"><div class="text-xs text-slate-500">SOBRA APÓS PARCELAS</div><b id="sobra" class="text-lg"></b></div>
-  </section>
-
-  <div class="flex items-center justify-between mb-3">
-    <h2 class="text-xl font-bold">Contas ativas</h2>
-    <button id="nova" class="bg-emerald-600 text-white font-bold rounded-xl px-4 py-2">+ Nova conta</button>
+    <h2 style="margin-top:22px;margin-bottom:10px">✅ Quitadas</h2>
+    <div id="listaQuitadas"></div>
   </div>
-  <div id="listaAtivas" class="space-y-3 mb-6"></div>
-
-  <h2 class="text-xl font-bold mb-3">✅ Quitadas</h2>
-  <div id="listaQuitadas" class="space-y-3"></div>
 </div>
 
-<div id="modal" class="hidden fixed inset-0 bg-black/50 items-center justify-center p-4">
-  <div class="bg-white rounded-2xl p-5 w-full max-w-md">
-    <div class="flex justify-between mb-3"><h3 id="tituloModal" class="font-bold text-xl">Nova conta</h3><button id="fechar">✕</button></div>
+<div id="modalBg" class="modal-bg hidden">
+  <div class="modal">
+    <div class="row between mb"><h3 id="tituloModal" style="margin:0">Nova conta</h3><button id="fechar" class="btn-soft">✕</button></div>
     <input id="idEdit" type="hidden">
-    <input id="nome" placeholder="Descrição" class="w-full border rounded-xl p-3 mb-3">
-    <input id="valor" type="number" step="0.01" min="0" placeholder="Valor total" class="w-full border rounded-xl p-3 mb-3">
-    <div class="grid grid-cols-2 gap-3 mb-3">
-      <input id="parcelas" type="number" min="1" value="1" placeholder="Parcelas" class="border rounded-xl p-3">
-      <input id="pagas" type="number" min="0" value="0" placeholder="Já pagas" class="border rounded-xl p-3">
+    <div class="gap12">
+      <input id="nome" placeholder="Descrição">
+      <input id="valor" type="number" min="0" step="0.01" placeholder="Valor total">
+      <div class="cols2">
+        <input id="parcelas" type="number" min="1" value="1" placeholder="Parcelas">
+        <input id="pagas" type="number" min="0" value="0" placeholder="Já pagas">
+      </div>
+      <button id="salvar" class="btn-blue full">Salvar</button>
+      <button id="excluir" class="btn-red full hidden">Excluir conta</button>
     </div>
-    <button id="salvar" class="w-full bg-blue-600 text-white font-bold rounded-xl p-3">Salvar</button>
-    <button id="excluir" class="hidden w-full text-red-600 font-bold p-3 mt-2">Excluir</button>
   </div>
 </div>
 
 <script>
-const URL="https://ttfgefdggcnkcahazfgn.supabase.co";
-const KEY="sb_publishable_sSV95iogghc2Vsjt9WE5tQ__TzKUdKp";
-const sb=supabase.createClient(URL,KEY);
-
-const PADRAO=[
- {produto:"Notebook",valor:3612.40,parcelas:10,paga:6},
- {produto:"Empréstimo Agibank",valor:3811.68,parcelas:18,paga:8},
- {produto:"Cartão de Crédito",valor:208.08,parcelas:1,paga:1},
- {produto:"Nubank Empréstimo",valor:571.00,parcelas:7,paga:5},
- {produto:"Nubank Reforma",valor:256.48,parcelas:4,paga:3},
- {produto:"Paraíba",valor:358.20,parcelas:6,paga:6},
- {produto:"CredShop",valor:50.00,parcelas:1,paga:1},
- {produto:"Plano Tim",valor:39.99,parcelas:1,paga:1}
-];
-
-let user=null, contas=[], renda=0, canal=null;
-const $=x=>document.getElementById(x);
+const BASE="https://ttfgefdggcnkcahazfgn.supabase.co";
+const APIKEY="sb_publishable_sSV95iogghc2Vsjt9WE5tQ__TzKUdKp";
+const SESSION_KEY="matheus_supabase_session_v1";
+let session=null, user=null, contas=[], renda=0, carregando=false;
+const $=id=>document.getElementById(id);
 const moeda=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-const parcela=x=>x.valor/x.parcelas;
-const restante=x=>parcela(x)*Math.max(0,x.parcelas-x.paga);
-const html=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+const parcela=x=>Number(x.valor)/Number(x.parcelas);
+const restante=x=>parcela(x)*Math.max(0,Number(x.parcelas)-Number(x.paga));
+const safe=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
 
-function status(t){$("sync").textContent=t}
-function mensagem(t,erro=false){$("msg").textContent=t;$("msg").className="text-sm mt-3 "+(erro?"text-red-600":"text-emerald-600")}
-function dadosLocais(){
+function setMsg(text,type="info"){
+  const el=$("msg"); el.textContent=text; el.className="notice "+type;
+}
+function setSync(text){$("sync").textContent=text}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+async function fetchTimeout(url,opts={},ms=20000){
+  const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms);
+  try{return await fetch(url,{...opts,signal:c.signal})}finally{clearTimeout(t)}
+}
+function saveSession(s){
+  session=s;
+  if(s)localStorage.setItem(SESSION_KEY,JSON.stringify(s)); else localStorage.removeItem(SESSION_KEY);
+}
+function loadSession(){
+  try{return JSON.parse(localStorage.getItem(SESSION_KEY)||"null")}catch{return null}
+}
+function expiredSoon(){
+  if(!session?.expires_at)return false;
+  return Date.now()/1000 > Number(session.expires_at)-60;
+}
+async function refreshSession(){
+  if(!session?.refresh_token)throw new Error("Sessão expirada. Entre novamente.");
+  const r=await fetchTimeout(BASE+"/auth/v1/token?grant_type=refresh_token",{
+    method:"POST",headers:{"apikey":APIKEY,"Content-Type":"application/json"},
+    body:JSON.stringify({refresh_token:session.refresh_token})
+  });
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.msg||j.message||j.error_description||"Não foi possível renovar a sessão.");
+  saveSession({
+    access_token:j.access_token,refresh_token:j.refresh_token,
+    expires_at:Math.floor(Date.now()/1000)+Number(j.expires_in||3600),user:j.user
+  });
+  user=j.user;
+}
+async function authFetch(path,options={},retry=true){
+  if(expiredSoon())await refreshSession();
+  const headers={...(options.headers||{}),"apikey":APIKEY,"Authorization":"Bearer "+session.access_token};
+  const r=await fetchTimeout(BASE+path,{...options,headers});
+  if(r.status===401&&retry){
+    await refreshSession();
+    return authFetch(path,options,false);
+  }
+  return r;
+}
+async function authAction(kind){
+  const email=$("email").value.trim(), password=$("senha").value;
+  if(!email||password.length<6){setMsg("Use um e-mail válido e uma senha com pelo menos 6 caracteres.","err");return}
+  const btn=kind==="signup"?$("criar"):$("entrar");
+  const old=btn.textContent; btn.disabled=true;
+  btn.textContent=kind==="signup"?"Criando...":"Entrando...";
+  setMsg(kind==="signup"?"Criando sua conta...":"Conectando...","info");
+  try{
+    let url,body={email,password};
+    if(kind==="signup"){
+      url=BASE+"/auth/v1/signup?redirect_to="+encodeURIComponent(location.origin+location.pathname);
+    }else{
+      url=BASE+"/auth/v1/token?grant_type=password";
+    }
+    const r=await fetchTimeout(url,{method:"POST",headers:{"apikey":APIKEY,"Content-Type":"application/json"},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok)throw new Error(j.msg||j.message||j.error_description||("Erro "+r.status));
+    if(j.access_token){
+      const s={access_token:j.access_token,refresh_token:j.refresh_token,expires_at:Math.floor(Date.now()/1000)+Number(j.expires_in||3600),user:j.user};
+      saveSession(s); user=j.user; await enterApp();
+    }else if(kind==="signup"){
+      setMsg("Conta criada. Confira seu e-mail para confirmar o cadastro. Depois volte aqui e toque em Entrar.","ok");
+    }else{
+      throw new Error("O servidor não retornou uma sessão.");
+    }
+  }catch(e){
+    const text=e.name==="AbortError"?"A conexão demorou demais. Verifique a internet e tente novamente.":e.message;
+    setMsg(text,"err");
+  }finally{
+    btn.disabled=false;btn.textContent=old;
+  }
+}
+
+function localData(){
   try{
     const raw=localStorage.getItem("matheus_fin_v4")||localStorage.getItem("matheus_fin_v3");
     const a=raw?JSON.parse(raw):null;
     if(!Array.isArray(a)||!a.length)return null;
-    return a.map(x=>({produto:String(x.produto||"Conta"),valor:Number(x.valor)||0,parcelas:Math.max(1,Number(x.parcelas)||1),paga:Math.max(0,Math.min(Number(x.parcelas)||1,Number(x.paga)||0))})).filter(x=>x.valor>0);
-  }catch(e){return null}
+    return a.map(x=>({
+      produto:String(x.produto||"Conta"),
+      valor:Number(x.valor)||0,
+      parcelas:Math.max(1,Number(x.parcelas)||1),
+      paga:Math.max(0,Math.min(Number(x.parcelas)||1,Number(x.paga)||0))
+    })).filter(x=>x.valor>0);
+  }catch{return null}
 }
-async function migrar(){
-  const {data,error}=await sb.from("finance_accounts").select("id").limit(1);
-  if(error)throw error;
-  if(data.length)return;
-  const base=dadosLocais()||PADRAO;
-  const {error:e}=await sb.from("finance_accounts").insert(base.map(x=>({...x,user_id:user.id})));
-  if(e)throw e;
-  const r=Number(localStorage.getItem("matheus_income")||0);
-  if(r>0)await sb.from("finance_settings").upsert({user_id:user.id,renda_mensal:r});
+async function apiJSON(path,opts={}){
+  const r=await authFetch(path,opts);
+  const text=await r.text(); let j=null;
+  try{j=text?JSON.parse(text):null}catch{j=text}
+  if(!r.ok)throw new Error(j?.message||j?.hint||j?.details||String(j||("Erro "+r.status)));
+  return j;
 }
-async function carregar(){
-  if(!user)return;
-  status("☁️ Sincronizando");
-  await migrar();
-  const [a,b]=await Promise.all([
-    sb.from("finance_accounts").select("*").order("created_at"),
-    sb.from("finance_settings").select("renda_mensal").maybeSingle()
-  ]);
-  if(a.error)throw a.error;if(b.error)throw b.error;
-  contas=(a.data||[]).map(x=>({...x,valor:Number(x.valor),parcelas:Number(x.parcelas),paga:Number(x.paga)}));
-  renda=Number(b.data?.renda_mensal||0);
-  $("renda").value=renda||"";
-  render();
-  status("☁️ Sincronizado");
+async function loadCloud(){
+  if(!session||carregando)return;
+  carregando=true;setSync("☁️ Sincronizando...");
+  try{
+    const [a,s]=await Promise.all([
+      apiJSON("/rest/v1/finance_accounts?select=*&order=created_at.asc"),
+      apiJSON("/rest/v1/finance_settings?select=renda_mensal&limit=1")
+    ]);
+    contas=(a||[]).map(x=>({...x,valor:Number(x.valor),parcelas:Number(x.parcelas),paga:Number(x.paga)}));
+    renda=Number(s?.[0]?.renda_mensal||0);
+    $("renda").value=renda||"";
+    render();
+    const local=localData();
+    if(contas.length===0&&local?.length){
+      $("importBox").classList.remove("hidden");
+      $("importText").textContent=`Este aparelho tem ${local.length} conta(s) salvas no navegador. Importe somente no aparelho que possui os dados mais atualizados.`;
+    }else $("importBox").classList.add("hidden");
+    setSync("☁️ Sincronizado");
+  }finally{carregando=false}
 }
+async function importarLocal(){
+  const local=localData(); if(!local?.length)return;
+  if(!confirm(`Importar ${local.length} conta(s) deste aparelho para a nuvem?`))return;
+  setSync("☁️ Importando...");
+  await apiJSON("/rest/v1/finance_accounts",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Prefer":"return=minimal"},
+    body:JSON.stringify(local.map(x=>({...x,user_id:user.id})))
+  });
+  const localIncome=Number(localStorage.getItem("matheus_income")||0);
+  if(localIncome>0){
+    await saveIncomeValue(localIncome);
+  }
+  $("importBox").classList.add("hidden");
+  await loadCloud();
+}
+async function saveIncomeValue(value){
+  await apiJSON("/rest/v1/finance_settings?on_conflict=user_id",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Prefer":"resolution=merge-duplicates,return=minimal"},
+    body:JSON.stringify({user_id:user.id,renda_mensal:value})
+  });
+}
+
 function render(){
   const at=contas.filter(x=>x.paga<x.parcelas), q=contas.filter(x=>x.paga>=x.parcelas);
   const mensal=at.reduce((s,x)=>s+parcela(x),0), dev=at.reduce((s,x)=>s+restante(x),0);
   $("mensal").textContent=moeda(mensal);$("devedor").textContent=moeda(dev);$("ativas").textContent=at.length;
   $("sobra").textContent=renda>0?moeda(renda-mensal):"—";
-  $("listaAtivas").innerHTML=at.length?at.map(x=>`
-    <div class="bg-white border rounded-2xl p-4">
-      <div class="flex justify-between gap-3"><div><b class="text-lg">${html(x.produto)}</b><div class="text-xs text-slate-500">${x.paga}/${x.parcelas} pagas · faltam ${x.parcelas-x.paga}</div></div><button onclick="editar(${x.id})" class="text-blue-600">Editar</button></div>
-      <div class="grid grid-cols-3 gap-2 mt-3 text-sm"><div>Parcela<br><b>${moeda(parcela(x))}</b></div><div>Restante<br><b class="text-red-600">${moeda(restante(x))}</b></div><div>Total<br><b>${moeda(x.valor)}</b></div></div>
-      <button onclick="pagar(${x.id})" class="w-full mt-3 border border-emerald-300 text-emerald-700 font-bold rounded-xl py-2">✓ Marcar 1 parcela como paga</button>
-    </div>`).join(""):'<div class="bg-white border rounded-2xl p-4">Nenhuma conta ativa 🎉</div>';
-  $("listaQuitadas").innerHTML=q.length?q.map(x=>`<div class="bg-white border rounded-2xl p-4 flex justify-between"><div><b>${html(x.produto)}</b><div class="text-xs text-slate-500">${moeda(x.valor)} · quitada</div></div><button onclick="editar(${x.id})" class="text-blue-600">Editar</button></div>`).join(""):'<div class="bg-white border rounded-2xl p-4">Nenhuma conta quitada.</div>';
+  $("listaAtivas").innerHTML=at.length?at.map(x=>{
+    const pct=Math.min(100,(x.paga/x.parcelas)*100);
+    return `<div class="account">
+      <div class="row between"><div><b>${safe(x.produto)}</b><div class="muted small">${x.paga}/${x.parcelas} pagas · faltam ${x.parcelas-x.paga}</div></div><button class="linkbtn" onclick="editar(${x.id})">Editar</button></div>
+      <div class="account-grid"><div><span class="label">PARCELA</span><br><b>${moeda(parcela(x))}</b></div><div><span class="label">RESTANTE</span><br><b style="color:#dc2626">${moeda(restante(x))}</b></div><div><span class="label">TOTAL</span><br><b>${moeda(x.valor)}</b></div></div>
+      <div class="progress"><div style="width:${pct}%"></div></div>
+      <button class="pay" onclick="pagar(${x.id})">✓ Marcar 1 parcela como paga</button>
+    </div>`;
+  }).join(""):'<div class="card muted">Nenhuma conta ativa.</div>';
+  $("listaQuitadas").innerHTML=q.length?q.map(x=>`<div class="account row between"><div><b>${safe(x.produto)}</b><div class="muted small">${moeda(x.valor)} · quitada</div></div><button class="linkbtn" onclick="editar(${x.id})">Editar</button></div>`).join(""):'<div class="card muted">Nenhuma conta quitada.</div>';
 }
 async function pagar(id){
-  const x=contas.find(c=>c.id===id);if(!x||x.paga>=x.parcelas)return;
+  const x=contas.find(c=>c.id===id);if(!x)return;
   if(!confirm(`Confirmar pagamento de uma parcela de "${x.produto}"?`))return;
-  status("☁️ Salvando...");
-  const {error}=await sb.from("finance_accounts").update({paga:x.paga+1}).eq("id",id);
-  if(error)return alert(error.message);await carregar();
+  setSync("☁️ Salvando...");
+  await apiJSON(`/rest/v1/finance_accounts?id=eq.${id}`,{
+    method:"PATCH",headers:{"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({paga:x.paga+1})
+  });
+  await loadCloud();
 }
 window.pagar=pagar;
-function abrir(){$("modal").classList.remove("hidden");$("modal").classList.add("flex")}
-function fechar(){$("modal").classList.add("hidden");$("modal").classList.remove("flex")}
-$("nova").onclick=()=>{$("idEdit").value="";$("nome").value="";$("valor").value="";$("parcelas").value=1;$("pagas").value=0;$("excluir").classList.add("hidden");$("tituloModal").textContent="Nova conta";abrir()}
-window.editar=id=>{const x=contas.find(c=>c.id===id);$("idEdit").value=x.id;$("nome").value=x.produto;$("valor").value=x.valor;$("parcelas").value=x.parcelas;$("pagas").value=x.paga;$("excluir").classList.remove("hidden");$("tituloModal").textContent="Editar conta";abrir()}
-$("fechar").onclick=fechar;
-$("salvar").onclick=async()=>{
-  const produto=$("nome").value.trim(),valor=Number($("valor").value),parcelas=Math.max(1,Number($("parcelas").value)||1),paga=Math.max(0,Math.min(parcelas,Number($("pagas").value)||0));
-  if(!produto||valor<=0)return alert("Preencha nome e valor.");
-  status("☁️ Salvando...");
-  let r;
-  if($("idEdit").value)r=await sb.from("finance_accounts").update({produto,valor,parcelas,paga}).eq("id",Number($("idEdit").value));
-  else r=await sb.from("finance_accounts").insert({user_id:user.id,produto,valor,parcelas,paga});
-  if(r.error)return alert(r.error.message);fechar();await carregar();
-}
-$("excluir").onclick=async()=>{if(!confirm("Excluir esta conta?"))return;const {error}=await sb.from("finance_accounts").delete().eq("id",Number($("idEdit").value));if(error)return alert(error.message);fechar();await carregar()}
-$("salvarRenda").onclick=async()=>{renda=Math.max(0,Number($("renda").value)||0);status("☁️ Salvando...");const {error}=await sb.from("finance_settings").upsert({user_id:user.id,renda_mensal:renda});if(error)return alert(error.message);await carregar()}
-$("entrar").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("senha").value});if(error)mensagem("Não consegui entrar: "+error.message,true)}
-$("criar").onclick=async()=>{
-  const email=$("email").value.trim(),password=$("senha").value;
-  if(!email||password.length<6)return mensagem("Use e-mail válido e senha com pelo menos 6 caracteres.",true);
-  const {data,error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
-  if(error)return mensagem("Não consegui criar: "+error.message,true);
-  mensagem(data.session?"Conta criada. Entrando...":"Conta criada. Confira seu e-mail para confirmar e depois volte para entrar.");
-}
-$("sair").onclick=()=>sb.auth.signOut();
 
-async function entrarApp(session){
-  user=session.user;$("login").classList.add("hidden");$("app").classList.remove("hidden");
-  try{
-    await carregar();
-    if(canal)sb.removeChannel(canal);
-    canal=sb.channel("fin-"+user.id)
-      .on("postgres_changes",{event:"*",schema:"public",table:"finance_accounts"},()=>carregar())
-      .on("postgres_changes",{event:"*",schema:"public",table:"finance_settings"},()=>carregar())
-      .subscribe();
-  }catch(e){status("⚠️ Erro");alert("Erro ao sincronizar: "+e.message)}
+function abrirModal(){$("modalBg").classList.remove("hidden")}
+function fecharModal(){$("modalBg").classList.add("hidden")}
+$("nova").onclick=()=>{
+  $("idEdit").value="";$("nome").value="";$("valor").value="";$("parcelas").value=1;$("pagas").value=0;
+  $("tituloModal").textContent="Nova conta";$("excluir").classList.add("hidden");abrirModal();
+};
+window.editar=id=>{
+  const x=contas.find(c=>c.id===id);if(!x)return;
+  $("idEdit").value=x.id;$("nome").value=x.produto;$("valor").value=x.valor;$("parcelas").value=x.parcelas;$("pagas").value=x.paga;
+  $("tituloModal").textContent="Editar conta";$("excluir").classList.remove("hidden");abrirModal();
+};
+$("fechar").onclick=fecharModal;
+$("modalBg").onclick=e=>{if(e.target===$("modalBg"))fecharModal()};
+$("salvar").onclick=async()=>{
+  const produto=$("nome").value.trim(), valor=Number($("valor").value), parcelas=Math.max(1,Number($("parcelas").value)||1), paga=Math.max(0,Math.min(parcelas,Number($("pagas").value)||0));
+  if(!produto||valor<=0)return alert("Preencha nome e valor corretamente.");
+  setSync("☁️ Salvando...");
+  const id=$("idEdit").value;
+  if(id){
+    await apiJSON(`/rest/v1/finance_accounts?id=eq.${id}`,{
+      method:"PATCH",headers:{"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({produto,valor,parcelas,paga})
+    });
+  }else{
+    await apiJSON("/rest/v1/finance_accounts",{
+      method:"POST",headers:{"Content-Type":"application/json","Prefer":"return=minimal"},body:JSON.stringify({user_id:user.id,produto,valor,parcelas,paga})
+    });
+  }
+  fecharModal();await loadCloud();
+};
+$("excluir").onclick=async()=>{
+  const id=$("idEdit").value;if(!id||!confirm("Excluir esta conta?"))return;
+  await apiJSON(`/rest/v1/finance_accounts?id=eq.${id}`,{method:"DELETE",headers:{"Prefer":"return=minimal"}});
+  fecharModal();await loadCloud();
+};
+$("salvarRenda").onclick=async()=>{
+  const v=Math.max(0,Number($("renda").value)||0);setSync("☁️ Salvando...");
+  await saveIncomeValue(v);await loadCloud();
+};
+$("importar").onclick=()=>importarLocal().catch(e=>alert("Não consegui importar: "+e.message));
+$("naoImportar").onclick=()=>$("importBox").classList.add("hidden");
+$("atualizar").onclick=()=>loadCloud().catch(e=>alert(e.message));
+$("entrar").onclick=()=>authAction("login");
+$("criar").onclick=()=>authAction("signup");
+$("sair").onclick=async()=>{
+  try{if(session?.access_token)await fetchTimeout(BASE+"/auth/v1/logout",{method:"POST",headers:{"apikey":APIKEY,"Authorization":"Bearer "+session.access_token}},8000)}catch{}
+  saveSession(null);user=null;contas=[];renda=0;
+  $("appView").classList.add("hidden");$("loginView").classList.remove("hidden");
+  setMsg("Você saiu da conta.","info");
+};
+
+async function enterApp(){
+  user=session?.user;
+  if(!user)throw new Error("Sessão inválida.");
+  $("loginView").classList.add("hidden");$("appView").classList.remove("hidden");
+  await loadCloud();
 }
-function sairApp(){user=null;contas=[];renda=0;if(canal){sb.removeChannel(canal);canal=null}$("app").classList.add("hidden");$("login").classList.remove("hidden")}
-sb.auth.onAuthStateChange((e,s)=>setTimeout(()=>s?entrarApp(s):sairApp(),0));
 $("dataHoje").textContent="Hoje: "+new Date().toLocaleDateString("pt-BR");
-(async()=>{const {data:{session}}=await sb.auth.getSession();session?entrarApp(session):sairApp()})();
+window.addEventListener("focus",()=>{if(session)loadCloud().catch(()=>{})});
+setInterval(()=>{if(session&&!document.hidden)loadCloud().catch(()=>{})},30000);
+
+(async()=>{
+  session=loadSession();
+  if(session){
+    try{
+      if(expiredSoon())await refreshSession();
+      user=session.user;await enterApp();
+    }catch{
+      saveSession(null);session=null;user=null;
+      setMsg("Sua sessão expirou. Entre novamente.","info");
+    }
+  }
+})();
 </script>
 </body>
 </html>
