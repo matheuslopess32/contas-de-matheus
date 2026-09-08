@@ -1,352 +1,199 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f172a">
-<title>Finanças do Matheus — V2</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Contas de Matheus</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<style>
-  body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-  .modal{transition:.2s}
-</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
-<div class="max-w-5xl mx-auto p-4 md:p-6">
+<div id="login" class="min-h-screen flex items-center justify-center p-4">
+  <div class="w-full max-w-md bg-white p-6 rounded-3xl border shadow-sm">
+    <h1 class="text-2xl font-bold text-center">💰 Contas de Matheus</h1>
+    <p class="text-sm text-slate-500 text-center mt-2 mb-5">Entre para sincronizar celular e computador.</p>
+    <input id="email" type="email" placeholder="E-mail" class="w-full border rounded-xl p-3 mb-3">
+    <input id="senha" type="password" placeholder="Senha (mínimo 6 caracteres)" class="w-full border rounded-xl p-3 mb-3">
+    <button id="entrar" class="w-full bg-blue-600 text-white font-bold rounded-xl p-3 mb-2">Entrar</button>
+    <button id="criar" class="w-full border border-blue-200 text-blue-700 font-bold rounded-xl p-3">Criar conta</button>
+    <div id="msg" class="text-sm mt-3"></div>
+  </div>
+</div>
 
-  <header class="bg-slate-900 text-white rounded-2xl p-5 md:p-6 mb-5 shadow">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+<div id="app" class="hidden max-w-4xl mx-auto p-4">
+  <header class="bg-slate-900 text-white rounded-2xl p-5 mb-4">
+    <div class="flex justify-between gap-3">
       <div>
         <h1 class="text-2xl font-bold">💰 Contas de Matheus</h1>
-        <p class="text-slate-300 text-sm mt-1">Controle de dívidas, renda e parcelas</p>
+        <div id="dataHoje" class="text-sm text-slate-300 mt-1"></div>
       </div>
-      <div class="text-left md:text-right">
-        <div id="todayDate" class="font-semibold"></div>
-        <div id="currentMonth" class="text-sm text-slate-300"></div>
+      <div class="text-right">
+        <div id="sync" class="text-xs bg-white/10 rounded-full px-2 py-1">☁️ Sincronizando</div>
+        <button id="sair" class="text-xs mt-2 underline">Sair</button>
       </div>
     </div>
   </header>
 
-  <section class="bg-white rounded-2xl p-5 shadow-sm border mb-5">
-    <div class="flex flex-col md:flex-row gap-3 md:items-end">
-      <div class="flex-1">
-        <label class="text-xs font-bold uppercase text-slate-500">Renda mensal</label>
-        <input id="incomeInput" type="number" step="0.01" min="0"
-          class="mt-1 w-full rounded-xl border p-3" placeholder="Ex.: 1800">
-      </div>
-      <button id="saveIncome" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-xl">Salvar renda</button>
-    </div>
-    <p class="text-xs text-slate-400 mt-2">A renda fica salva neste navegador.</p>
-  </section>
-
-  <section class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-    <div class="bg-white rounded-2xl p-4 border shadow-sm">
-      <div class="text-xs text-slate-500 uppercase font-bold">A pagar no mês</div>
-      <div id="monthlyDue" class="text-xl font-bold mt-1">R$ 0,00</div>
-    </div>
-    <div class="bg-white rounded-2xl p-4 border shadow-sm">
-      <div class="text-xs text-slate-500 uppercase font-bold">Saldo devedor</div>
-      <div id="remainingDebt" class="text-xl font-bold mt-1 text-red-600">R$ 0,00</div>
-    </div>
-    <div class="bg-white rounded-2xl p-4 border shadow-sm">
-      <div class="text-xs text-slate-500 uppercase font-bold">Contas ativas</div>
-      <div id="activeCount" class="text-xl font-bold mt-1">0</div>
-    </div>
-    <div class="bg-white rounded-2xl p-4 border shadow-sm">
-      <div class="text-xs text-slate-500 uppercase font-bold">Sobra após parcelas</div>
-      <div id="availableAfterBills" class="text-xl font-bold mt-1">—</div>
+  <section class="bg-white border rounded-2xl p-4 mb-4">
+    <label class="text-xs uppercase font-bold text-slate-500">Renda mensal</label>
+    <div class="flex gap-2 mt-1">
+      <input id="renda" type="number" step="0.01" min="0" class="border rounded-xl p-3 flex-1" placeholder="Ex.: 1800">
+      <button id="salvarRenda" class="bg-blue-600 text-white font-bold rounded-xl px-4">Salvar</button>
     </div>
   </section>
 
-  <section class="bg-white rounded-2xl p-5 border shadow-sm mb-5">
-    <div class="flex items-center justify-between gap-3 mb-3">
-      <div>
-        <h2 class="font-bold text-lg">Saúde financeira</h2>
-        <p class="text-xs text-slate-500">Quanto da renda está comprometido pelas parcelas ativas</p>
-      </div>
-      <span id="healthBadge" class="px-3 py-2 rounded-full text-xs font-bold bg-slate-100">Sem renda</span>
-    </div>
-    <div class="h-3 rounded-full bg-slate-100 overflow-hidden">
-      <div id="incomeBar" class="h-full bg-blue-500" style="width:0%"></div>
-    </div>
-    <div class="flex justify-between mt-2 text-xs text-slate-500">
-      <span id="commitmentText">Informe sua renda</span>
-      <span id="incomeValue">R$ 0,00</span>
-    </div>
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+    <div class="bg-white border rounded-2xl p-4"><div class="text-xs text-slate-500">A PAGAR NO MÊS</div><b id="mensal" class="text-lg"></b></div>
+    <div class="bg-white border rounded-2xl p-4"><div class="text-xs text-slate-500">SALDO DEVEDOR</div><b id="devedor" class="text-lg text-red-600"></b></div>
+    <div class="bg-white border rounded-2xl p-4"><div class="text-xs text-slate-500">CONTAS ATIVAS</div><b id="ativas" class="text-lg"></b></div>
+    <div class="bg-white border rounded-2xl p-4"><div class="text-xs text-slate-500">SOBRA APÓS PARCELAS</div><b id="sobra" class="text-lg"></b></div>
   </section>
 
   <div class="flex items-center justify-between mb-3">
-    <div>
-      <h2 class="font-bold text-xl">Contas ativas</h2>
-      <p class="text-xs text-slate-500">Só entram no cálculo mensal enquanto ainda há parcelas a pagar.</p>
-    </div>
-    <button id="newItemBtn" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl">+ Nova conta</button>
+    <h2 class="text-xl font-bold">Contas ativas</h2>
+    <button id="nova" class="bg-emerald-600 text-white font-bold rounded-xl px-4 py-2">+ Nova conta</button>
   </div>
+  <div id="listaAtivas" class="space-y-3 mb-6"></div>
 
-  <section id="activeList" class="space-y-3 mb-7"></section>
-
-  <div class="mb-3">
-    <h2 class="font-bold text-xl">✅ Quitadas</h2>
-    <p class="text-xs text-slate-500">Ficam separadas e não pesam no valor mensal.</p>
-  </div>
-  <section id="paidList" class="space-y-3 mb-7"></section>
-
-  <section class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900">
-    <b>Prioridade sugerida:</b> evite assumir novas parcelas enquanto houver dívidas relevantes em aberto.
-    Quando uma parcela acabar, tente direcionar o valor liberado para quitar outra dívida ou formar reserva.
-  </section>
+  <h2 class="text-xl font-bold mb-3">✅ Quitadas</h2>
+  <div id="listaQuitadas" class="space-y-3"></div>
 </div>
 
-<!-- Modal -->
-<div id="modal" class="hidden fixed inset-0 bg-black/50 z-50 items-center justify-center p-4">
-  <div class="bg-white rounded-2xl w-full max-w-md p-5 shadow-xl">
-    <div class="flex justify-between items-center mb-4">
-      <h3 id="modalTitle" class="font-bold text-xl">Nova conta</h3>
-      <button id="closeModal" class="text-slate-400 text-2xl">×</button>
+<div id="modal" class="hidden fixed inset-0 bg-black/50 items-center justify-center p-4">
+  <div class="bg-white rounded-2xl p-5 w-full max-w-md">
+    <div class="flex justify-between mb-3"><h3 id="tituloModal" class="font-bold text-xl">Nova conta</h3><button id="fechar">✕</button></div>
+    <input id="idEdit" type="hidden">
+    <input id="nome" placeholder="Descrição" class="w-full border rounded-xl p-3 mb-3">
+    <input id="valor" type="number" step="0.01" min="0" placeholder="Valor total" class="w-full border rounded-xl p-3 mb-3">
+    <div class="grid grid-cols-2 gap-3 mb-3">
+      <input id="parcelas" type="number" min="1" value="1" placeholder="Parcelas" class="border rounded-xl p-3">
+      <input id="pagas" type="number" min="0" value="0" placeholder="Já pagas" class="border rounded-xl p-3">
     </div>
-    <input id="editId" type="hidden">
-    <div class="space-y-3">
-      <div>
-        <label class="text-xs uppercase font-bold text-slate-500">Descrição</label>
-        <input id="nameInput" class="w-full border rounded-xl p-3 mt-1" placeholder="Ex.: Notebook">
-      </div>
-      <div>
-        <label class="text-xs uppercase font-bold text-slate-500">Valor total</label>
-        <input id="valueInput" type="number" step="0.01" min="0" class="w-full border rounded-xl p-3 mt-1">
-      </div>
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-xs uppercase font-bold text-slate-500">Parcelas</label>
-          <input id="installmentsInput" type="number" min="1" class="w-full border rounded-xl p-3 mt-1" value="1">
-        </div>
-        <div>
-          <label class="text-xs uppercase font-bold text-slate-500">Já pagas</label>
-          <input id="paidInput" type="number" min="0" class="w-full border rounded-xl p-3 mt-1" value="0">
-        </div>
-      </div>
-      <button id="saveItemBtn" class="w-full bg-blue-600 text-white rounded-xl py-3 font-bold">Salvar</button>
-      <button id="deleteItemBtn" class="hidden w-full text-red-600 rounded-xl py-2 font-bold">Excluir conta</button>
-    </div>
+    <button id="salvar" class="w-full bg-blue-600 text-white font-bold rounded-xl p-3">Salvar</button>
+    <button id="excluir" class="hidden w-full text-red-600 font-bold p-3 mt-2">Excluir</button>
   </div>
 </div>
 
 <script>
-const DEFAULT_DB = [
-  {id:101,produto:"Notebook",valor:3612.40,parcelas:10,paga:6},
-  {id:102,produto:"Empréstimo Agibank",valor:3811.68,parcelas:18,paga:8},
-  {id:103,produto:"Cartão de Crédito",valor:208.08,parcelas:1,paga:1},
-  {id:104,produto:"Nubank Empréstimo",valor:571.00,parcelas:7,paga:5},
-  {id:105,produto:"Nubank Reforma",valor:256.48,parcelas:4,paga:3},
-  {id:106,produto:"Paraíba",valor:358.20,parcelas:6,paga:6},
-  {id:107,produto:"CredShop",valor:50.00,parcelas:1,paga:1},
-  {id:108,produto:"Plano Tim",valor:39.99,parcelas:1,paga:1}
+const URL="https://ttfgefdggcnkcahazfgn.supabase.co";
+const KEY="sb_publishable_sSV95iogghc2Vsjt9WE5tQ__TzKUdKp";
+const sb=supabase.createClient(URL,KEY);
+
+const PADRAO=[
+ {produto:"Notebook",valor:3612.40,parcelas:10,paga:6},
+ {produto:"Empréstimo Agibank",valor:3811.68,parcelas:18,paga:8},
+ {produto:"Cartão de Crédito",valor:208.08,parcelas:1,paga:1},
+ {produto:"Nubank Empréstimo",valor:571.00,parcelas:7,paga:5},
+ {produto:"Nubank Reforma",valor:256.48,parcelas:4,paga:3},
+ {produto:"Paraíba",valor:358.20,parcelas:6,paga:6},
+ {produto:"CredShop",valor:50.00,parcelas:1,paga:1},
+ {produto:"Plano Tim",valor:39.99,parcelas:1,paga:1}
 ];
 
-function loadDB(){
-  const v4 = localStorage.getItem("matheus_fin_v4");
-  if(v4) return JSON.parse(v4);
-  const v3 = localStorage.getItem("matheus_fin_v3");
-  if(v3){
-    const old = JSON.parse(v3).map(x=>({
-      id:x.id, produto:x.produto, valor:Number(x.valor)||0,
-      parcelas:Number(x.parcelas)||1, paga:Number(x.paga)||0
-    }));
-    localStorage.setItem("matheus_fin_v4", JSON.stringify(old));
-    return old;
-  }
-  return structuredClone(DEFAULT_DB);
+let user=null, contas=[], renda=0, canal=null;
+const $=x=>document.getElementById(x);
+const moeda=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const parcela=x=>x.valor/x.parcelas;
+const restante=x=>parcela(x)*Math.max(0,x.parcelas-x.paga);
+const html=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+
+function status(t){$("sync").textContent=t}
+function mensagem(t,erro=false){$("msg").textContent=t;$("msg").className="text-sm mt-3 "+(erro?"text-red-600":"text-emerald-600")}
+function dadosLocais(){
+  try{
+    const raw=localStorage.getItem("matheus_fin_v4")||localStorage.getItem("matheus_fin_v3");
+    const a=raw?JSON.parse(raw):null;
+    if(!Array.isArray(a)||!a.length)return null;
+    return a.map(x=>({produto:String(x.produto||"Conta"),valor:Number(x.valor)||0,parcelas:Math.max(1,Number(x.parcelas)||1),paga:Math.max(0,Math.min(Number(x.parcelas)||1,Number(x.paga)||0))})).filter(x=>x.valor>0);
+  }catch(e){return null}
 }
-
-let db = loadDB();
-let income = Number(localStorage.getItem("matheus_income") || 0);
-
-const fmt = n => Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-
-function setCurrentDate(){
-  const now = new Date();
-  document.getElementById("todayDate").textContent =
-    "Hoje: " + now.toLocaleDateString("pt-BR");
-  document.getElementById("currentMonth").textContent =
-    now.toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+async function migrar(){
+  const {data,error}=await sb.from("finance_accounts").select("id").limit(1);
+  if(error)throw error;
+  if(data.length)return;
+  const base=dadosLocais()||PADRAO;
+  const {error:e}=await sb.from("finance_accounts").insert(base.map(x=>({...x,user_id:user.id})));
+  if(e)throw e;
+  const r=Number(localStorage.getItem("matheus_income")||0);
+  if(r>0)await sb.from("finance_settings").upsert({user_id:user.id,renda_mensal:r});
 }
-
-function saveDB(){ localStorage.setItem("matheus_fin_v4", JSON.stringify(db)); }
-
-function remaining(item){
-  const parc = item.valor / item.parcelas;
-  return parc * Math.max(0, item.parcelas - item.paga);
-}
-function monthly(item){
-  return item.paga < item.parcelas ? item.valor / item.parcelas : 0;
-}
-
-function render(){
-  saveDB();
-  const active = db.filter(x=>x.paga < x.parcelas);
-  const paid = db.filter(x=>x.paga >= x.parcelas);
-
-  const monthlyDue = active.reduce((s,x)=>s+monthly(x),0);
-  const remainingDebt = active.reduce((s,x)=>s+remaining(x),0);
-
-  document.getElementById("monthlyDue").textContent = fmt(monthlyDue);
-  document.getElementById("remainingDebt").textContent = fmt(remainingDebt);
-  document.getElementById("activeCount").textContent = active.length;
-  document.getElementById("incomeValue").textContent = fmt(income);
-
-  const available = income > 0 ? income - monthlyDue : null;
-  const availableEl = document.getElementById("availableAfterBills");
-  availableEl.textContent = available === null ? "—" : fmt(available);
-  availableEl.className = "text-xl font-bold mt-1 " + (available !== null && available < 0 ? "text-red-600" : "text-emerald-600");
-
-  const pct = income > 0 ? (monthlyDue/income)*100 : 0;
-  document.getElementById("incomeBar").style.width = Math.min(100,pct) + "%";
-  document.getElementById("commitmentText").textContent =
-    income > 0 ? `${pct.toFixed(1)}% da renda comprometida` : "Informe sua renda";
-
-  const badge = document.getElementById("healthBadge");
-  if(!income){
-    badge.textContent="Sem renda informada";
-    badge.className="px-3 py-2 rounded-full text-xs font-bold bg-slate-100 text-slate-600";
-  } else if(pct <= 30){
-    badge.textContent="Boa ✅";
-    badge.className="px-3 py-2 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700";
-  } else if(pct <= 50){
-    badge.textContent="Atenção 🟡";
-    badge.className="px-3 py-2 rounded-full text-xs font-bold bg-amber-100 text-amber-700";
-  } else {
-    badge.textContent="Comprometida ⚠️";
-    badge.className="px-3 py-2 rounded-full text-xs font-bold bg-red-100 text-red-700";
-  }
-
-  document.getElementById("activeList").innerHTML =
-    active.length ? active.sort((a,b)=>monthly(b)-monthly(a)).map(cardActive).join("") :
-    `<div class="bg-white border rounded-2xl p-5 text-slate-500">Nenhuma conta ativa 🎉</div>`;
-
-  document.getElementById("paidList").innerHTML =
-    paid.length ? paid.map(cardPaid).join("") :
-    `<div class="bg-white border rounded-2xl p-5 text-slate-500">Nenhuma conta quitada ainda.</div>`;
-}
-
-function cardActive(x){
-  const parc = x.valor/x.parcelas;
-  const rest = x.parcelas-x.paga;
-  const pct = (x.paga/x.parcelas)*100;
-  return `<div class="bg-white border rounded-2xl p-4 shadow-sm">
-    <div class="flex justify-between gap-3">
-      <div>
-        <div class="font-bold text-lg">${escapeHtml(x.produto)}</div>
-        <div class="text-xs text-slate-500">${x.paga}/${x.parcelas} parcelas pagas · faltam ${rest}</div>
-      </div>
-      <button onclick="openEdit(${x.id})" class="text-blue-600 font-semibold">Editar</button>
-    </div>
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4 text-sm">
-      <div><span class="text-slate-400 text-xs">Parcela</span><br><b>${fmt(parc)}</b></div>
-      <div><span class="text-slate-400 text-xs">Restante</span><br><b class="text-red-600">${fmt(remaining(x))}</b></div>
-      <div><span class="text-slate-400 text-xs">Total</span><br><b>${fmt(x.valor)}</b></div>
-    </div>
-    <div class="h-2 bg-slate-100 rounded-full overflow-hidden mt-4">
-      <div class="h-full bg-emerald-500" style="width:${pct}%"></div>
-    </div>
-    <button onclick="markPaid(${x.id})" class="mt-4 w-full border border-emerald-300 text-emerald-700 font-bold rounded-xl py-2">
-      ✓ Marcar 1 parcela como paga
-    </button>
-  </div>`;
-}
-
-function cardPaid(x){
-  return `<div class="bg-white border rounded-2xl p-4 opacity-80">
-    <div class="flex justify-between items-center gap-3">
-      <div>
-        <div class="font-bold">${escapeHtml(x.produto)}</div>
-        <div class="text-xs text-slate-500">${fmt(x.valor)} · ${x.parcelas}/${x.parcelas} parcelas pagas</div>
-      </div>
-      <button onclick="openEdit(${x.id})" class="text-blue-600 font-semibold text-sm">Editar</button>
-    </div>
-  </div>`;
-}
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
-}
-
-window.markPaid = id => {
-  const item=db.find(x=>x.id===id);
-  if(!item || item.paga>=item.parcelas) return;
-  if(confirm(`Confirmar pagamento de uma parcela de "${item.produto}"?`)){
-    item.paga++;
-    render();
-  }
-};
-
-function openModal(){
-  modal.classList.remove("hidden");
-  modal.classList.add("flex");
-}
-function closeModalFn(){
-  modal.classList.add("hidden");
-  modal.classList.remove("flex");
-}
-
-newItemBtn.onclick=()=>{
-  modalTitle.textContent="Nova conta";
-  editId.value="";
-  nameInput.value="";
-  valueInput.value="";
-  installmentsInput.value=1;
-  paidInput.value=0;
-  deleteItemBtn.classList.add("hidden");
-  openModal();
-};
-
-window.openEdit = id => {
-  const item=db.find(x=>x.id===id);
-  if(!item) return;
-  modalTitle.textContent="Editar conta";
-  editId.value=item.id;
-  nameInput.value=item.produto;
-  valueInput.value=item.valor;
-  installmentsInput.value=item.parcelas;
-  paidInput.value=item.paga;
-  deleteItemBtn.classList.remove("hidden");
-  openModal();
-};
-
-closeModal.onclick=closeModalFn;
-modal.addEventListener("click",e=>{if(e.target===modal)closeModalFn()});
-
-saveItemBtn.onclick=()=>{
-  const nome=nameInput.value.trim();
-  const valor=Number(valueInput.value);
-  const parcelas=Math.max(1,Number(installmentsInput.value)||1);
-  const paga=Math.max(0,Math.min(parcelas,Number(paidInput.value)||0));
-  if(!nome || valor<=0) return alert("Preencha nome e valor corretamente.");
-
-  if(editId.value){
-    const item=db.find(x=>x.id==editId.value);
-    item.produto=nome; item.valor=valor; item.parcelas=parcelas; item.paga=paga;
-  } else {
-    db.push({id:Date.now(),produto:nome,valor,parcelas,paga});
-  }
-  closeModalFn(); render();
-};
-
-deleteItemBtn.onclick=()=>{
-  if(!editId.value) return;
-  if(confirm("Excluir esta conta?")){
-    db=db.filter(x=>x.id!=editId.value);
-    closeModalFn(); render();
-  }
-};
-
-saveIncome.onclick=()=>{
-  income=Math.max(0,Number(incomeInput.value)||0);
-  localStorage.setItem("matheus_income",income);
+async function carregar(){
+  if(!user)return;
+  status("☁️ Sincronizando");
+  await migrar();
+  const [a,b]=await Promise.all([
+    sb.from("finance_accounts").select("*").order("created_at"),
+    sb.from("finance_settings").select("renda_mensal").maybeSingle()
+  ]);
+  if(a.error)throw a.error;if(b.error)throw b.error;
+  contas=(a.data||[]).map(x=>({...x,valor:Number(x.valor),parcelas:Number(x.parcelas),paga:Number(x.paga)}));
+  renda=Number(b.data?.renda_mensal||0);
+  $("renda").value=renda||"";
   render();
-};
+  status("☁️ Sincronizado");
+}
+function render(){
+  const at=contas.filter(x=>x.paga<x.parcelas), q=contas.filter(x=>x.paga>=x.parcelas);
+  const mensal=at.reduce((s,x)=>s+parcela(x),0), dev=at.reduce((s,x)=>s+restante(x),0);
+  $("mensal").textContent=moeda(mensal);$("devedor").textContent=moeda(dev);$("ativas").textContent=at.length;
+  $("sobra").textContent=renda>0?moeda(renda-mensal):"—";
+  $("listaAtivas").innerHTML=at.length?at.map(x=>`
+    <div class="bg-white border rounded-2xl p-4">
+      <div class="flex justify-between gap-3"><div><b class="text-lg">${html(x.produto)}</b><div class="text-xs text-slate-500">${x.paga}/${x.parcelas} pagas · faltam ${x.parcelas-x.paga}</div></div><button onclick="editar(${x.id})" class="text-blue-600">Editar</button></div>
+      <div class="grid grid-cols-3 gap-2 mt-3 text-sm"><div>Parcela<br><b>${moeda(parcela(x))}</b></div><div>Restante<br><b class="text-red-600">${moeda(restante(x))}</b></div><div>Total<br><b>${moeda(x.valor)}</b></div></div>
+      <button onclick="pagar(${x.id})" class="w-full mt-3 border border-emerald-300 text-emerald-700 font-bold rounded-xl py-2">✓ Marcar 1 parcela como paga</button>
+    </div>`).join(""):'<div class="bg-white border rounded-2xl p-4">Nenhuma conta ativa 🎉</div>';
+  $("listaQuitadas").innerHTML=q.length?q.map(x=>`<div class="bg-white border rounded-2xl p-4 flex justify-between"><div><b>${html(x.produto)}</b><div class="text-xs text-slate-500">${moeda(x.valor)} · quitada</div></div><button onclick="editar(${x.id})" class="text-blue-600">Editar</button></div>`).join(""):'<div class="bg-white border rounded-2xl p-4">Nenhuma conta quitada.</div>';
+}
+async function pagar(id){
+  const x=contas.find(c=>c.id===id);if(!x||x.paga>=x.parcelas)return;
+  if(!confirm(`Confirmar pagamento de uma parcela de "${x.produto}"?`))return;
+  status("☁️ Salvando...");
+  const {error}=await sb.from("finance_accounts").update({paga:x.paga+1}).eq("id",id);
+  if(error)return alert(error.message);await carregar();
+}
+window.pagar=pagar;
+function abrir(){$("modal").classList.remove("hidden");$("modal").classList.add("flex")}
+function fechar(){$("modal").classList.add("hidden");$("modal").classList.remove("flex")}
+$("nova").onclick=()=>{$("idEdit").value="";$("nome").value="";$("valor").value="";$("parcelas").value=1;$("pagas").value=0;$("excluir").classList.add("hidden");$("tituloModal").textContent="Nova conta";abrir()}
+window.editar=id=>{const x=contas.find(c=>c.id===id);$("idEdit").value=x.id;$("nome").value=x.produto;$("valor").value=x.valor;$("parcelas").value=x.parcelas;$("pagas").value=x.paga;$("excluir").classList.remove("hidden");$("tituloModal").textContent="Editar conta";abrir()}
+$("fechar").onclick=fechar;
+$("salvar").onclick=async()=>{
+  const produto=$("nome").value.trim(),valor=Number($("valor").value),parcelas=Math.max(1,Number($("parcelas").value)||1),paga=Math.max(0,Math.min(parcelas,Number($("pagas").value)||0));
+  if(!produto||valor<=0)return alert("Preencha nome e valor.");
+  status("☁️ Salvando...");
+  let r;
+  if($("idEdit").value)r=await sb.from("finance_accounts").update({produto,valor,parcelas,paga}).eq("id",Number($("idEdit").value));
+  else r=await sb.from("finance_accounts").insert({user_id:user.id,produto,valor,parcelas,paga});
+  if(r.error)return alert(r.error.message);fechar();await carregar();
+}
+$("excluir").onclick=async()=>{if(!confirm("Excluir esta conta?"))return;const {error}=await sb.from("finance_accounts").delete().eq("id",Number($("idEdit").value));if(error)return alert(error.message);fechar();await carregar()}
+$("salvarRenda").onclick=async()=>{renda=Math.max(0,Number($("renda").value)||0);status("☁️ Salvando...");const {error}=await sb.from("finance_settings").upsert({user_id:user.id,renda_mensal:renda});if(error)return alert(error.message);await carregar()}
+$("entrar").onclick=async()=>{const {error}=await sb.auth.signInWithPassword({email:$("email").value.trim(),password:$("senha").value});if(error)mensagem("Não consegui entrar: "+error.message,true)}
+$("criar").onclick=async()=>{
+  const email=$("email").value.trim(),password=$("senha").value;
+  if(!email||password.length<6)return mensagem("Use e-mail válido e senha com pelo menos 6 caracteres.",true);
+  const {data,error}=await sb.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});
+  if(error)return mensagem("Não consegui criar: "+error.message,true);
+  mensagem(data.session?"Conta criada. Entrando...":"Conta criada. Confira seu e-mail para confirmar e depois volte para entrar.");
+}
+$("sair").onclick=()=>sb.auth.signOut();
 
-incomeInput.value = income || "";
-setCurrentDate();
-render();
+async function entrarApp(session){
+  user=session.user;$("login").classList.add("hidden");$("app").classList.remove("hidden");
+  try{
+    await carregar();
+    if(canal)sb.removeChannel(canal);
+    canal=sb.channel("fin-"+user.id)
+      .on("postgres_changes",{event:"*",schema:"public",table:"finance_accounts"},()=>carregar())
+      .on("postgres_changes",{event:"*",schema:"public",table:"finance_settings"},()=>carregar())
+      .subscribe();
+  }catch(e){status("⚠️ Erro");alert("Erro ao sincronizar: "+e.message)}
+}
+function sairApp(){user=null;contas=[];renda=0;if(canal){sb.removeChannel(canal);canal=null}$("app").classList.add("hidden");$("login").classList.remove("hidden")}
+sb.auth.onAuthStateChange((e,s)=>setTimeout(()=>s?entrarApp(s):sairApp(),0));
+$("dataHoje").textContent="Hoje: "+new Date().toLocaleDateString("pt-BR");
+(async()=>{const {data:{session}}=await sb.auth.getSession();session?entrarApp(session):sairApp()})();
 </script>
 </body>
 </html>
