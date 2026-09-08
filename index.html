@@ -59,6 +59,19 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 @media(max-width:760px){.grid4{grid-template-columns:1fr 1fr}.header{flex-direction:column}.right{text-align:left}.account-grid{grid-template-columns:1fr 1fr}.kpi{min-height:92px}.profile-switch-card{align-items:stretch;flex-direction:column}.profile-avatar{width:120px;height:120px;font-size:58px}.profile-tile{width:120px}.profile-grid{gap:22px 16px}.profile-tile .profile-label{font-size:15px}}
 @media(max-width:420px){.profile-avatar{width:105px;height:105px;font-size:50px}.profile-tile{width:105px}.profile-grid{gap:20px 14px}.profile-chooser-shell h1{font-size:28px}.chooser-actions{gap:8px}.chooser-btn{font-size:12px;padding:10px 12px}}
 
+.profile-avatar img,.mini-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.mini-avatar{overflow:hidden}
+.profile-photo-btn{position:absolute;right:7px;bottom:7px;width:38px;height:38px;border-radius:50%;padding:0;display:grid;place-items:center;background:#fff;color:#111;font-size:18px;border:2px solid #111;box-shadow:0 2px 8px #0005}
+.profile-photo-btn:hover{transform:scale(1.06)}
+#avatarInput{display:none}
+#savingMessage{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;background:#111;color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;box-shadow:0 8px 28px #0005}
+.saving-dialog{position:fixed;inset:0;background:#0008;z-index:35;display:flex;align-items:center;justify-content:center;padding:18px}
+.saving-card{width:min(100%,520px);background:#fff;border-radius:22px;padding:24px;text-align:center;box-shadow:0 18px 50px #0004}
+.saving-icon{font-size:42px;margin-bottom:8px}
+.saving-card h2{margin-bottom:8px}
+.saving-quote{font-size:18px;line-height:1.5;color:#334155;margin:12px 0 18px}
+.saving-tip{font-size:13px;color:#64748b;margin-bottom:18px}
+
 /* Fundo interativo de feriados */
 #holidayBg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .6s ease;background:
   radial-gradient(circle at calc(20% + var(--hx,0px)) calc(18% + var(--hy,0px)),var(--holiday-a,#16a34a33),transparent 34%),
@@ -114,6 +127,18 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
     <div class="chooser-actions">
       <button id="gerenciarPerfis" class="chooser-btn" type="button">Gerenciar perfis</button>
     </div>
+  </div>
+</div>
+
+<input id="avatarInput" type="file" accept="image/*">
+
+<div id="savingDialog" class="saving-dialog hidden" role="dialog" aria-modal="true" aria-labelledby="savingTitle">
+  <div class="saving-card">
+    <div class="saving-icon">💰</div>
+    <h2 id="savingTitle">Comece cuidando do seu futuro</h2>
+    <div id="savingQuote" class="saving-quote"></div>
+    <div id="savingTip" class="saving-tip"></div>
+    <button id="savingContinue" class="btn-blue" type="button">Ver meu planejamento</button>
   </div>
 </div>
 
@@ -318,7 +343,12 @@ const AVATAR_GRADIENTS=[
 ];
 function avatarFor(profile){
   const n=Math.abs(Number(profile?.id)||0);
-  return {emoji:AVATAR_EMOJIS[n%AVATAR_EMOJIS.length],bg:AVATAR_GRADIENTS[n%AVATAR_GRADIENTS.length]};
+  return {emoji:AVATAR_EMOJIS[n%AVATAR_EMOJIS.length],bg:AVATAR_GRADIENTS[n%AVATAR_GRADIENTS.length],photo:profile?.avatar_data||null};
+}
+function avatarMarkup(profile,cls=""){
+  const av=avatarFor(profile);
+  if(av.photo)return `<img src="${av.photo}" alt="Foto do perfil ${safe(profile.nome)}">`;
+  return av.emoji;
 }
 function renderProfiles(){
   if(!perfilAtual&&perfis.length)perfilAtual=perfis[0];
@@ -326,7 +356,7 @@ function renderProfiles(){
     const av=avatarFor(perfilAtual);
     $("perfilHeader").textContent="Perfil: "+perfilAtual.nome;
     $("perfilNomeDashboard").textContent=perfilAtual.nome;
-    $("miniAvatar").textContent=av.emoji;
+    $("miniAvatar").innerHTML=av.photo?`<img src="${av.photo}" alt="">`:av.emoji;
     $("miniAvatar").style.background=av.bg;
   }
   const grid=$("profileGrid");
@@ -338,8 +368,9 @@ function renderProfiles(){
         <button type="button" data-action="rename" data-id="${p.id}" aria-label="Renomear ${safe(p.nome)}">✎</button>
         <button type="button" class="danger" data-action="delete" data-id="${p.id}" aria-label="Excluir ${safe(p.nome)}"${perfis.length<=1?" disabled":""}>🗑</button>
       </div>`:"";
+    const photoButton=manage?`<button type="button" class="profile-photo-btn" data-action="photo" data-id="${p.id}" aria-label="Mudar foto de ${safe(p.nome)}">📷</button>`:"";
     return `<button type="button" class="profile-tile" data-action="select" data-id="${p.id}" aria-label="Abrir perfil ${safe(p.nome)}">
-      <span class="profile-avatar" style="background:${av.bg}">${av.emoji}${manage}</span>
+      <span class="profile-avatar" style="background:${av.bg}">${av.photo?`<img src="${av.photo}" alt="">`:av.emoji}${manage}${photoButton}</span>
       <span class="profile-label">${safe(p.nome)}</span>
     </button>`;
   }).join("");
@@ -358,6 +389,32 @@ function showProfileChooser(){
   manageProfiles=false;
   renderProfiles();
 }
+const SAVING_QUOTES=[
+  "Cada real que você deixa de gastar por impulso pode trabalhar a favor dos seus planos.",
+  "Economizar não é deixar de viver; é escolher melhor para onde o seu dinheiro vai.",
+  "Pequenos cortes repetidos todos os meses viram grandes resultados com o tempo.",
+  "Antes de comprar, pergunte: eu preciso disso agora ou quero isso por alguns minutos?",
+  "Seu futuro financeiro melhora quando você decide hoje o que realmente merece seu dinheiro.",
+  "Guardar pouco com frequência é melhor do que esperar sobrar muito um dia.",
+  "Planejar suas contas é uma forma de comprar tranquilidade para o mês seguinte.",
+  "Quando você controla as parcelas, sobra mais liberdade para escolher o que fazer com seu dinheiro.",
+  "Uma compra evitada hoje pode ser parte de uma meta realizada amanhã.",
+  "Economizar é transformar intenção em oportunidade."
+];
+const SAVING_TIPS=[
+  "Dica: defina um valor pequeno para guardar assim que receber sua renda.",
+  "Dica: espere 24 horas antes de uma compra não essencial.",
+  "Dica: acompanhe suas parcelas antes de assumir uma nova.",
+  "Dica: tente manter uma parte da renda livre para imprevistos.",
+  "Dica: revise suas contas recorrentes e elimine o que você quase não usa."
+];
+function showSavingMessage(){
+  const quote=SAVING_QUOTES[Math.floor(Math.random()*SAVING_QUOTES.length)];
+  const tip=SAVING_TIPS[Math.floor(Math.random()*SAVING_TIPS.length)];
+  $("savingQuote").textContent=quote;
+  $("savingTip").textContent=tip;
+  $("savingDialog").classList.remove("hidden");
+}
 async function selectProfile(id){
   const found=perfis.find(p=>p.id===Number(id));
   if(!found)return;
@@ -367,6 +424,7 @@ async function selectProfile(id){
   $("profileChooserView").classList.add("hidden");
   $("appView").classList.remove("hidden");
   await loadCloud();
+  showSavingMessage();
 }
 async function loadCloud(){
   if(!session||!perfilAtual||carregando)return;
@@ -473,6 +531,55 @@ $("excluir").onclick=async()=>{
   fecharModal();await loadCloud();
 };
 
+$("savingContinue").onclick=()=>$("savingDialog").classList.add("hidden");
+
+let avatarProfileTarget=null;
+function fileToDataURL(file){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=()=>resolve(r.result);
+    r.onerror=()=>reject(new Error("Não consegui ler a imagem."));
+    r.readAsDataURL(file);
+  });
+}
+async function resizeAvatarFile(file){
+  if(!file.type.startsWith("image/"))throw new Error("Escolha uma imagem.");
+  if(file.size>12*1024*1024)throw new Error("A imagem é muito grande. Escolha uma de até 12 MB.");
+  const src=await fileToDataURL(file);
+  const img=new Image();
+  await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(new Error("Imagem inválida."));img.src=src;});
+  const size=320, canvas=document.createElement("canvas");
+  canvas.width=size;canvas.height=size;
+  const ctx=canvas.getContext("2d");
+  const scale=Math.max(size/img.width,size/img.height);
+  const w=img.width*scale,h=img.height*scale;
+  ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+  return canvas.toDataURL("image/jpeg",0.82);
+}
+$("avatarInput").addEventListener("change",async()=>{
+  const file=$("avatarInput").files?.[0];
+  if(!file||!avatarProfileTarget)return;
+  try{
+    setSync("☁️ Salvando foto...");
+    const data=await resizeAvatarFile(file);
+    await apiJSON(`/rest/v1/finance_profiles?id=eq.${avatarProfileTarget.id}`,{
+      method:"PATCH",
+      headers:{"Content-Type":"application/json",Prefer:"return=minimal"},
+      body:JSON.stringify({avatar_data:data})
+    });
+    avatarProfileTarget.avatar_data=data;
+    if(perfilAtual?.id===avatarProfileTarget.id)perfilAtual.avatar_data=data;
+    renderProfiles();
+    setSync("☁️ Sincronizado");
+  }catch(err){
+    alert("Não consegui salvar a foto: "+err.message);
+    setSync("⚠️ Erro");
+  }finally{
+    $("avatarInput").value="";
+    avatarProfileTarget=null;
+  }
+});
+
 $("profileGrid").addEventListener("click",async e=>{
   const actionEl=e.target.closest("[data-action]");
   if(!actionEl)return;
@@ -488,6 +595,14 @@ $("profileGrid").addEventListener("click",async e=>{
       perfis.push(p);
       renderProfiles();
     }catch(err){alert("Não consegui criar o perfil: "+err.message)}
+    return;
+  }
+
+  if(action==="photo"){
+    e.stopPropagation();
+    const p=perfis.find(x=>x.id===id);if(!p)return;
+    avatarProfileTarget=p;
+    $("avatarInput").click();
     return;
   }
 
