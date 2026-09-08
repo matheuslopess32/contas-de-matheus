@@ -30,8 +30,34 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 .notice{padding:13px;border-radius:13px;font-size:14px}.ok{background:#ecfdf5;color:#047857}.err{background:#fef2f2;color:#b91c1c}.info{background:#eff6ff;color:#1d4ed8}.warn{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
 .modal-bg{position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center;padding:16px;z-index:20}.modal{width:min(100%,440px);background:#fff;border-radius:20px;padding:18px}
 .cols2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.profilebar{display:grid;grid-template-columns:minmax(170px,1fr) auto auto auto;gap:8px;align-items:end}.profile-actions{display:flex;gap:8px}
-@media(max-width:760px){.grid4{grid-template-columns:1fr 1fr}.header{flex-direction:column}.right{text-align:left}.account-grid{grid-template-columns:1fr 1fr}.kpi{min-height:92px}.profilebar{grid-template-columns:1fr 1fr}.profilebar .profile-select{grid-column:1/-1}.profile-actions{grid-column:1/-1}.profile-actions button{flex:1}}
+.profile-switch-card{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.current-profile{display:flex;align-items:center;gap:12px;min-width:0}
+.mini-avatar{width:46px;height:46px;border-radius:10px;display:grid;place-items:center;font-size:25px;flex:0 0 auto;box-shadow:inset 0 0 0 2px #ffffff3b}
+.profile-name-now{font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Seletor de perfis inspirado na experiência de streaming */
+#profileChooserView{position:relative;z-index:2;min-height:100vh;background:linear-gradient(180deg,#141414f7,#0b0b0bf7);color:#fff;display:flex;align-items:center;justify-content:center;padding:26px 18px}
+.profile-chooser-shell{width:min(100%,980px);text-align:center}
+.profile-chooser-shell h1{font-size:clamp(28px,5vw,48px);font-weight:500;margin-bottom:10px}
+.profile-chooser-shell .chooser-sub{color:#b3b3b3;margin-bottom:30px}
+.profile-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:26px 20px;margin:0 auto 32px}
+.profile-tile{width:150px;background:transparent;color:#b3b3b3;padding:0;border-radius:0;position:relative}
+.profile-avatar{width:150px;height:150px;border-radius:8px;display:grid;place-items:center;font-size:72px;transition:transform .18s ease,border-color .18s ease,filter .18s ease;box-shadow:inset 0 0 0 3px transparent;overflow:hidden;position:relative}
+.profile-tile .profile-label{display:block;margin-top:10px;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profile-tile:hover .profile-avatar,.profile-tile:focus-visible .profile-avatar{transform:scale(1.055);box-shadow:inset 0 0 0 3px #fff;filter:brightness(1.05)}
+.profile-tile:hover,.profile-tile:focus-visible{color:#fff;outline:none}
+.add-avatar{background:#2b2b2b;color:#cfcfcf;font-size:74px;font-weight:200}
+.profile-manage-overlay{position:absolute;inset:0;border-radius:8px;background:#0009;display:flex;align-items:center;justify-content:center;gap:10px}
+.profile-manage-overlay button{width:46px;height:46px;border-radius:50%;padding:0;font-size:20px;background:#ffffffea;color:#111}
+.profile-manage-overlay button.danger{background:#ef4444;color:#fff}
+.chooser-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.chooser-btn{background:transparent;border:1px solid #808080;color:#b3b3b3;border-radius:2px;padding:10px 18px;letter-spacing:1.5px;text-transform:uppercase;font-size:13px}
+.chooser-btn:hover,.chooser-btn:focus-visible{border-color:#fff;color:#fff}
+.chooser-btn.done{background:#fff;color:#111;border-color:#fff}
+.chooser-top{position:absolute;top:16px;right:16px;display:flex;gap:8px}
+.chooser-top button{background:#ffffff12;color:#eee;padding:8px 10px}
+@media(max-width:760px){.grid4{grid-template-columns:1fr 1fr}.header{flex-direction:column}.right{text-align:left}.account-grid{grid-template-columns:1fr 1fr}.kpi{min-height:92px}.profile-switch-card{align-items:stretch;flex-direction:column}.profile-avatar{width:120px;height:120px;font-size:58px}.profile-tile{width:120px}.profile-grid{gap:22px 16px}.profile-tile .profile-label{font-size:15px}}
+@media(max-width:420px){.profile-avatar{width:105px;height:105px;font-size:50px}.profile-tile{width:105px}.profile-grid{gap:20px 14px}.profile-chooser-shell h1{font-size:28px}.chooser-actions{gap:8px}.chooser-btn{font-size:12px;padding:10px 12px}}
 
 /* Fundo interativo de feriados */
 #holidayBg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none;opacity:0;transition:opacity .6s ease;background:
@@ -44,7 +70,7 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 #holidayBg .holiday-item:nth-child(3n){animation-name:holidayFloatSwing}
 #holidayBg .holiday-item:nth-child(4n){animation-direction:reverse}
 #holidayBg .holiday-title{position:absolute;right:18px;bottom:16px;max-width:min(82vw,430px);padding:10px 14px;border:1px solid #ffffff55;border-radius:999px;background:#ffffffc7;backdrop-filter:blur(9px);color:#0f172a;font-size:13px;font-weight:800;box-shadow:0 8px 30px #0001}
-#loginView,#appView{position:relative;z-index:1}
+#loginView,#profileChooserView,#appView{position:relative;z-index:1}
 .holiday-spark{position:fixed;z-index:9;left:var(--sx);top:var(--sy);font-size:24px;pointer-events:none;animation:holidaySpark .9s ease-out forwards;transform:translate(-50%,-50%)}
 @keyframes holidayFloat{0%{transform:translate3d(0,0,0) rotate(0deg)}100%{transform:translate3d(var(--drift),-130vh,0) rotate(360deg)}}
 @keyframes holidayFloatSwing{0%{transform:translate3d(0,0,0) rotate(-12deg)}50%{transform:translate3d(var(--drift),-65vh,0) rotate(15deg)}100%{transform:translate3d(calc(var(--drift) * -.35),-130vh,0) rotate(-10deg)}}
@@ -76,6 +102,21 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
   </div>
 </div>
 
+<div id="profileChooserView" class="hidden">
+  <div class="chooser-top">
+    <button id="chooserCopyLink" type="button">Compartilhar link</button>
+    <button id="chooserLogout" type="button">Sair</button>
+  </div>
+  <div class="profile-chooser-shell">
+    <h1>Quem vai organizar as finanças?</h1>
+    <p class="chooser-sub">Escolha um perfil. Cada um mantém renda, contas e parcelas separadas.</p>
+    <div id="profileGrid" class="profile-grid" aria-live="polite"></div>
+    <div class="chooser-actions">
+      <button id="gerenciarPerfis" class="chooser-btn" type="button">Gerenciar perfis</button>
+    </div>
+  </div>
+</div>
+
 <div id="appView" class="hidden">
   <div class="wrap">
     <header class="header">
@@ -92,17 +133,16 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
       </div>
     </header>
 
-    <section class="card mb">
-      <div class="profilebar">
-        <div class="profile-select">
+    <section class="card mb profile-switch-card">
+      <div class="current-profile">
+        <div id="miniAvatar" class="mini-avatar" aria-hidden="true">🙂</div>
+        <div style="min-width:0">
           <div class="label">PERFIL ATUAL</div>
-          <select id="perfilSelect" style="margin-top:6px"></select>
+          <div id="perfilNomeDashboard" class="profile-name-now">—</div>
+          <div class="muted small">Este painel mostra somente os dados deste perfil.</div>
         </div>
-        <button id="novoPerfil" class="btn-green">+ Novo perfil</button>
-        <button id="renomearPerfil" class="btn-soft">Renomear</button>
-        <button id="excluirPerfil" class="btn-red">Excluir perfil</button>
       </div>
-      <div class="muted small mt">Ex.: Matheus, Mãe, João. As contas e a renda ficam separadas por perfil.</div>
+      <button id="trocarPerfil" class="btn-soft" type="button">Trocar perfil</button>
     </section>
 
     <div id="importBox" class="notice warn mb hidden">
@@ -161,7 +201,7 @@ button:disabled{opacity:.6;cursor:wait}.btn-blue{background:var(--blue);color:#f
 const BASE="https://ttfgefdggcnkcahazfgn.supabase.co";
 const APIKEY="sb_publishable_sSV95iogghc2Vsjt9WE5tQ__TzKUdKp";
 const SESSION_KEY="matheus_supabase_session_v1";
-let session=null,user=null,contas=[],renda=0,carregando=false,perfis=[],perfilAtual=null;
+let session=null,user=null,contas=[],renda=0,carregando=false,perfis=[],perfilAtual=null,manageProfiles=false;
 const $=id=>document.getElementById(id);
 const moeda=n=>Number(n||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 const parcela=x=>Number(x.valor)/Number(x.parcelas);
@@ -265,11 +305,68 @@ async function ensureProfiles(){
   }
   renderProfiles();
 }
+const AVATAR_EMOJIS=["🙂","😎","🤓","🦊","🐼","🐯","🦁","🐸","🐵","🐧","🚀","⭐"];
+const AVATAR_GRADIENTS=[
+  "linear-gradient(135deg,#2563eb,#60a5fa)",
+  "linear-gradient(135deg,#7c3aed,#c084fc)",
+  "linear-gradient(135deg,#059669,#34d399)",
+  "linear-gradient(135deg,#dc2626,#fb7185)",
+  "linear-gradient(135deg,#d97706,#fbbf24)",
+  "linear-gradient(135deg,#0891b2,#22d3ee)",
+  "linear-gradient(135deg,#be185d,#f472b6)",
+  "linear-gradient(135deg,#4338ca,#818cf8)"
+];
+function avatarFor(profile){
+  const n=Math.abs(Number(profile?.id)||0);
+  return {emoji:AVATAR_EMOJIS[n%AVATAR_EMOJIS.length],bg:AVATAR_GRADIENTS[n%AVATAR_GRADIENTS.length]};
+}
 function renderProfiles(){
-  $("perfilSelect").innerHTML=perfis.map(p=>`<option value="${p.id}">${safe(p.nome)}</option>`).join("");
-  $("perfilSelect").value=String(perfilAtual.id);
-  $("perfilHeader").textContent="Perfil: "+perfilAtual.nome;
-  $("excluirPerfil").disabled=perfis.length<=1;
+  if(!perfilAtual&&perfis.length)perfilAtual=perfis[0];
+  if(perfilAtual){
+    const av=avatarFor(perfilAtual);
+    $("perfilHeader").textContent="Perfil: "+perfilAtual.nome;
+    $("perfilNomeDashboard").textContent=perfilAtual.nome;
+    $("miniAvatar").textContent=av.emoji;
+    $("miniAvatar").style.background=av.bg;
+  }
+  const grid=$("profileGrid");
+  if(!grid)return;
+  const profileCards=perfis.map(p=>{
+    const av=avatarFor(p);
+    const manage=manageProfiles?`
+      <div class="profile-manage-overlay">
+        <button type="button" data-action="rename" data-id="${p.id}" aria-label="Renomear ${safe(p.nome)}">✎</button>
+        <button type="button" class="danger" data-action="delete" data-id="${p.id}" aria-label="Excluir ${safe(p.nome)}"${perfis.length<=1?" disabled":""}>🗑</button>
+      </div>`:"";
+    return `<button type="button" class="profile-tile" data-action="select" data-id="${p.id}" aria-label="Abrir perfil ${safe(p.nome)}">
+      <span class="profile-avatar" style="background:${av.bg}">${av.emoji}${manage}</span>
+      <span class="profile-label">${safe(p.nome)}</span>
+    </button>`;
+  }).join("");
+  const addCard=`<button type="button" class="profile-tile" data-action="add" aria-label="Adicionar novo perfil">
+    <span class="profile-avatar add-avatar">＋</span>
+    <span class="profile-label">Adicionar perfil</span>
+  </button>`;
+  grid.innerHTML=profileCards+addCard;
+  $("gerenciarPerfis").textContent=manageProfiles?"Concluir":"Gerenciar perfis";
+  $("gerenciarPerfis").classList.toggle("done",manageProfiles);
+}
+function showProfileChooser(){
+  $("loginView").classList.add("hidden");
+  $("appView").classList.add("hidden");
+  $("profileChooserView").classList.remove("hidden");
+  manageProfiles=false;
+  renderProfiles();
+}
+async function selectProfile(id){
+  const found=perfis.find(p=>p.id===Number(id));
+  if(!found)return;
+  perfilAtual=found;
+  localStorage.setItem(profileStorageKey(),perfilAtual.id);
+  renderProfiles();
+  $("profileChooserView").classList.add("hidden");
+  $("appView").classList.remove("hidden");
+  await loadCloud();
 }
 async function loadCloud(){
   if(!session||!perfilAtual||carregando)return;
@@ -376,44 +473,65 @@ $("excluir").onclick=async()=>{
   fecharModal();await loadCloud();
 };
 
-$("perfilSelect").onchange=async()=>{
-  const id=Number($("perfilSelect").value);
-  perfilAtual=perfis.find(p=>p.id===id);
-  if(!perfilAtual)return;
-  localStorage.setItem(profileStorageKey(),perfilAtual.id);
-  renderProfiles();await loadCloud();
+$("profileGrid").addEventListener("click",async e=>{
+  const actionEl=e.target.closest("[data-action]");
+  if(!actionEl)return;
+  const action=actionEl.dataset.action;
+  const id=Number(actionEl.dataset.id||0);
+
+  if(action==="add"){
+    const nome=(prompt("Nome do novo perfil. Ex.: Mãe, João, Casa")||"").trim();
+    if(!nome)return;
+    try{
+      setSync("☁️ Criando perfil...");
+      const p=await criarPerfil(nome);
+      perfis.push(p);
+      renderProfiles();
+    }catch(err){alert("Não consegui criar o perfil: "+err.message)}
+    return;
+  }
+
+  if(action==="rename"){
+    e.stopPropagation();
+    const p=perfis.find(x=>x.id===id);if(!p)return;
+    const nome=(prompt("Novo nome do perfil:",p.nome)||"").trim();
+    if(!nome||nome===p.nome)return;
+    try{
+      await apiJSON(`/rest/v1/finance_profiles?id=eq.${p.id}`,{
+        method:"PATCH",headers:{"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({nome})
+      });
+      p.nome=nome;
+      if(perfilAtual?.id===p.id)perfilAtual.nome=nome;
+      renderProfiles();
+    }catch(err){alert("Não consegui renomear: "+err.message)}
+    return;
+  }
+
+  if(action==="delete"){
+    e.stopPropagation();
+    if(perfis.length<=1)return alert("Você precisa manter pelo menos um perfil.");
+    const p=perfis.find(x=>x.id===id);if(!p)return;
+    if(!confirm(`Excluir o perfil "${p.nome}" e TODAS as contas dele?`))return;
+    try{
+      await apiJSON(`/rest/v1/finance_profiles?id=eq.${p.id}`,{method:"DELETE",headers:{Prefer:"return=minimal"}});
+      perfis=perfis.filter(x=>x.id!==p.id);
+      if(perfilAtual?.id===p.id)perfilAtual=perfis[0];
+      localStorage.setItem(profileStorageKey(),perfilAtual.id);
+      renderProfiles();
+    }catch(err){alert("Não consegui excluir o perfil: "+err.message)}
+    return;
+  }
+
+  if(action==="select"&&!manageProfiles){
+    await selectProfile(id);
+  }
+});
+
+$("gerenciarPerfis").onclick=()=>{
+  manageProfiles=!manageProfiles;
+  renderProfiles();
 };
-$("novoPerfil").onclick=async()=>{
-  const nome=(prompt("Nome do novo perfil. Ex.: Mãe, João, Casa")||"").trim();
-  if(!nome)return;
-  try{
-    setSync("☁️ Criando perfil...");
-    const p=await criarPerfil(nome);
-    perfis.push(p);perfilAtual=p;localStorage.setItem(profileStorageKey(),p.id);
-    renderProfiles();await loadCloud();
-  }catch(e){alert("Não consegui criar o perfil: "+e.message)}
-};
-$("renomearPerfil").onclick=async()=>{
-  if(!perfilAtual)return;
-  const nome=(prompt("Novo nome do perfil:",perfilAtual.nome)||"").trim();
-  if(!nome||nome===perfilAtual.nome)return;
-  try{
-    await apiJSON(`/rest/v1/finance_profiles?id=eq.${perfilAtual.id}`,{
-      method:"PATCH",headers:{"Content-Type":"application/json",Prefer:"return=minimal"},body:JSON.stringify({nome})
-    });
-    perfilAtual.nome=nome;renderProfiles();
-  }catch(e){alert("Não consegui renomear: "+e.message)}
-};
-$("excluirPerfil").onclick=async()=>{
-  if(perfis.length<=1)return alert("Você precisa manter pelo menos um perfil.");
-  if(!confirm(`Excluir o perfil "${perfilAtual.nome}" e TODAS as contas dele?`))return;
-  try{
-    const id=perfilAtual.id;
-    await apiJSON(`/rest/v1/finance_profiles?id=eq.${id}`,{method:"DELETE",headers:{Prefer:"return=minimal"}});
-    perfis=perfis.filter(p=>p.id!==id);perfilAtual=perfis[0];
-    localStorage.setItem(profileStorageKey(),perfilAtual.id);renderProfiles();await loadCloud();
-  }catch(e){alert("Não consegui excluir o perfil: "+e.message)}
-};
+$("trocarPerfil").onclick=()=>showProfileChooser();
 
 $("salvarRenda").onclick=async()=>{
   try{const v=Math.max(0,Number($("renda").value)||0);setSync("☁️ Salvando...");await saveIncomeValue(v);await loadCloud()}
@@ -427,18 +545,30 @@ $("copiarLink").onclick=async()=>{
   try{await navigator.clipboard.writeText(url);alert("Link copiado. Pode enviar para outra pessoa criar o próprio cadastro.")}
   catch{prompt("Copie este link:",url)}
 };
+$("chooserCopyLink").onclick=async()=>{
+  const url=location.origin+location.pathname;
+  try{await navigator.clipboard.writeText(url);alert("Link copiado. A outra pessoa pode criar o próprio cadastro, separado do seu.")}
+  catch{prompt("Copie este link:",url)}
+};
 $("entrar").onclick=()=>authAction("login");
 $("criar").onclick=()=>authAction("signup");
-$("sair").onclick=async()=>{
+async function logoutApp(){
   try{if(session?.access_token)await fetchTimeout(BASE+"/auth/v1/logout",{method:"POST",headers:{apikey:APIKEY,Authorization:"Bearer "+session.access_token}},8000)}catch{}
-  saveSession(null);user=null;contas=[];renda=0;perfis=[];perfilAtual=null;
-  $("appView").classList.add("hidden");$("loginView").classList.remove("hidden");setMsg("Você saiu da conta.","info");
-};
+  saveSession(null);user=null;contas=[];renda=0;perfis=[];perfilAtual=null;manageProfiles=false;
+  $("appView").classList.add("hidden");
+  $("profileChooserView").classList.add("hidden");
+  $("loginView").classList.remove("hidden");
+  setMsg("Você saiu da conta.","info");
+}
+$("sair").onclick=logoutApp;
+$("chooserLogout").onclick=logoutApp;
 
 async function enterApp(){
   user=session?.user;if(!user)throw new Error("Sessão inválida.");
-  $("loginView").classList.add("hidden");$("appView").classList.remove("hidden");
-  await ensureProfiles();await loadCloud();
+  $("loginView").classList.add("hidden");
+  $("appView").classList.add("hidden");
+  await ensureProfiles();
+  showProfileChooser();
 }
 $("dataHoje").textContent="Hoje: "+new Date().toLocaleDateString("pt-BR");
 window.addEventListener("focus",()=>{if(session&&perfilAtual)loadCloud().catch(()=>{})});
